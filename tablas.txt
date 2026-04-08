@@ -1,0 +1,189 @@
+CREATE TABLE Proyectos (
+    ProyectoID INT IDENTITY(1,1) NOT NULL,
+    Nombre VARCHAR(100) NOT NULL,
+    Departamento VARCHAR(50) NOT NULL,
+    Municipio VARCHAR(50) NOT NULL,
+    PlazoMaximo INT NOT NULL CONSTRAINT chk_plazomaximo CHECK (PlazoMaximo > 0),
+    CONSTRAINT pk_proyectos PRIMARY KEY(ID)
+)
+GO
+
+
+CREATE TABLE Etapa (
+    EtapaID INT IDENTITY(1,1) NOT NULL,
+    ProyectoID INT NOT NULL,
+    Nombre VARCHAR(100) NOT NULL,
+    PrecioVara FLOAT NOT NULL CONSTRAINT chk_preciovara CHECK (PrecioVara > 0),
+    Interes FLOAT NOT NULL CONSTRAINT chk_interes CHECK (Interes >= 0),
+    AreaVerde FLOAT NOT NULL CONSTRAINT chk_areaverde CHECK (AreaVerde >= 0 AND AreaVerde <= 1),
+    CONSTRAINT pk_etapas PRIMARY KEY(EtapaID),
+    CONSTRAINT fk_etapas_proyectos FOREIGN KEY(ProyectoID) REFERENCES Proyectos(ProyectoID)
+)
+GO
+
+CREATE TABLE Bloque (
+    BloqueID INT IDENTITY(1,1) NOT NULL,
+    EtapaID INT NOT NULL,
+    NumeroBloque INT NOT NULL,
+    CONSTRAINT pk_bloques PRIMARY KEY(BloqueID),
+    CONSTRAINT fk_bloques_etapas FOREIGN KEY(EtapaID) REFERENCES Etapas(EtapaID)
+)
+GO
+
+
+CREATE TABLE Lote (
+    LoteID INT IDENTITY(1,1) NOT NULL,
+    BloqueID INT NOT NULL,
+    Numero INT NOT NULL,
+    Area FLOAT NOT NULL CONSTRAINT chk_area CHECK (Area > 0),
+    Catastro VARCHAR(50) NOT NULL,
+    Matricula VARCHAR(50) NOT NULL,
+    Colindancias VARCHAR(MAX) NOT NULL,
+    Esquina BIT NOT NULL DEFAULT 0,
+    Parque BIT NOT NULL DEFAULT 0,
+    CalleCerrada BIT NOT NULL DEFAULT 0,
+    Estado VARCHAR(20) NOT NULL DEFAULT 'Disponible',
+    CONSTRAINT pk_lotes PRIMARY KEY(LoteID),
+    CONSTRAINT fk_lotes_bloques FOREIGN KEY(BloqueID) REFERENCES Bloques(BloqueID)
+)
+GO
+
+CREATE TABLE Cliente (
+    ClienteID INT IDENTITY(1,1) NOT NULL,
+    Nombre VARCHAR(100) NOT NULL,
+    DNI VARCHAR(15) NOT NULL,
+    Telefono VARCHAR(15) NOT NULL,
+    Trabajo VARCHAR(100) NOT NULL,
+    Sueldo FLOAT NOT NULL CONSTRAINT chk_sueldo_cliente CHECK (Sueldo > 0),
+    CONSTRAINT pk_clientes PRIMARY KEY(ClienteID)
+)
+GO
+
+CREATE TABLE Aval (
+    AvalID INT IDENTITY(1,1) NOT NULL,
+    Nombre VARCHAR(100) NOT NULL,
+    DNI VARCHAR(15) NOT NULL,
+    Telefono VARCHAR(15) NOT NULL,
+    Trabajo VARCHAR(100) NOT NULL,
+    Sueldo FLOAT NOT NULL CONSTRAINT chk_sueldo_aval CHECK (Sueldo > 0),
+    CONSTRAINT pk_avales PRIMARY KEY(AvalID)
+)
+GO
+
+
+CREATE TABLE Beneficiario (
+    BeneficiarioID INT IDENTITY(1,1) NOT NULL,
+    Nombre VARCHAR(100) NOT NULL,
+    DNI VARCHAR(15) NOT NULL,
+    Telefono VARCHAR(15) NOT NULL,
+    Parentesco VARCHAR(50) NOT NULL,
+    CONSTRAINT pk_beneficiarios PRIMARY KEY(BeneficiarioID)
+)
+GO
+
+CREATE TABLE Empleado (
+    EmpleadoID INT IDENTITY(1,1) NOT NULL,
+    Nombre VARCHAR(100) NOT NULL,
+    Cargo VARCHAR(50) NOT NULL,
+    CONSTRAINT pk_empleado PRIMARY KEY(EmpleadoID)
+)
+GO
+
+CREATE TABLE Venta (
+    VentaID INT IDENTITY(1,1) NOT NULL,
+    LoteID INT NOT NULL,
+    ClienteID INT NOT NULL,
+    EmpleadoID INT NOT NULL,
+    AvalID INT NULL,
+    BeneficiarioID INT NULL,
+    Fecha DATETIME NOT NULL DEFAULT GETDATE(),
+    Tipo VARCHAR(10) NOT NULL,
+    Prima FLOAT NOT NULL DEFAULT 0,
+    Plazo INT NOT NULL, 
+    Interes FLOAT NOT NULL, 
+    CONSTRAINT pk_ventas PRIMARY KEY(VentaID),
+    CONSTRAINT fk_ventas_lotes FOREIGN KEY(LoteID) REFERENCES Lotes(LoteID),
+    CONSTRAINT fk_ventas_clientes FOREIGN KEY(ClienteID) REFERENCES Clientes(ClienteID),
+    CONSTRAINT fk_ventas_empleado FOREIGN KEY(EmpleadoID) REFERENCES Empleado(EmpleadoID),
+    CONSTRAINT fk_ventas_avales FOREIGN KEY(AvalID) REFERENCES Avales(AvalID),
+    CONSTRAINT fk_ventas_beneficiarios FOREIGN KEY(BeneficiarioID) REFERENCES Beneficiarios(BeneficiarioID)
+)
+GO
+
+CREATE TABLE PlanPago (
+    PlanPagoID INT IDENTITY(1,1) NOT NULL,
+    VentaID INT NOT NULL,
+    CuotaNumero INT NOT NULL,
+    FechaVencimiento DATETIME NOT NULL,
+    Monto FLOAT NOT NULL,
+    Capital FLOAT NOT NULL,
+    Interes FLOAT NOT NULL,
+    Estado VARCHAR(20) NOT NULL DEFAULT 'Pendiente',
+    CONSTRAINT pk_planpagos PRIMARY KEY(PlanPagoID),
+    CONSTRAINT fk_planpagos_ventas FOREIGN KEY(VentaID) REFERENCES Ventas(VentaID)
+)
+GO
+
+CREATE TABLE Cuenta (
+    CuentaID INT IDENTITY(1,1) NOT NULL,
+    EtapaID INT NOT NULL,
+    Banco VARCHAR(50) NOT NULL,
+    NumeroCuenta VARCHAR(50) NOT NULL,
+    CONSTRAINT pk_cuentas PRIMARY KEY(CuentaID),
+    CONSTRAINT fk_cuentas_etapas FOREIGN KEY(EtapaID) REFERENCES Etapas(EtapaID)
+)
+GO
+
+CREATE TABLE Pago (
+    PagoID INT IDENTITY(1,1) NOT NULL,
+    VentaID INT NOT NULL,
+    PlanPagoID INT NOT NULL, -- Para saber qué cuota del plan se está cancelando
+    EmpleadoID INT NOT NULL, -- El cajero que recibe el pago para "mejor control"
+    CuentaID INT NOT NULL,   -- Cuenta bancaria de la etapa donde ingresa el dinero
+    FechaPago DATETIME NOT NULL DEFAULT GETDATE(),
+    MontoPagado FLOAT NOT NULL CONSTRAINT chk_monto_pago CHECK (MontoPagado > 0),
+    CapitalPagado FLOAT NOT NULL,
+    InteresPagado FLOAT NOT NULL,
+    TipoPago VARCHAR(20) NOT NULL, -- 'Efectivo' o 'Deposito'
+    CONSTRAINT pk_pagos PRIMARY KEY(PagoID),
+    CONSTRAINT fk_pagos_ventas FOREIGN KEY(VentaID) REFERENCES Ventas(VentaID),
+    CONSTRAINT fk_pagos_plan FOREIGN KEY(PlanPagoID) REFERENCES PlanPagos(PlanPagoID),
+    CONSTRAINT fk_pagos_empleado FOREIGN KEY(EmpleadoID) REFERENCES Empleado(EmpleadoID),
+    CONSTRAINT fk_pagos_cuentas FOREIGN KEY(CuentaID) REFERENCES Cuentas(CuentaID)
+)
+GO
+
+
+CREATE TABLE Factura (
+    FacturaID INT IDENTITY(1,1) NOT NULL,
+    PagoID INT NOT NULL,
+    FechaEmision DATETIME NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT pk_factura PRIMARY KEY(FacturaID),
+    CONSTRAINT fk_factura_pagos FOREIGN KEY(PagoID) REFERENCES Pagos(PagoID)
+)
+GO
+
+
+CREATE TABLE Gastos (
+    GastoID INT IDENTITY(1,1) NOT NULL,
+    ProyectoID INT NOT NULL, 
+    Concepto VARCHAR(100) NOT NULL, 
+    Monto FLOAT NOT NULL CONSTRAINT chk_monto_gasto CHECK (Monto > 0),
+    Fecha DATETIME NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT pk_gastos PRIMARY KEY(GastoID),
+    CONSTRAINT fk_gastos_proyectos FOREIGN KEY(ProyectoID) REFERENCES Proyectos(ProyectoID)
+)
+GO
+
+CREATE TABLE DepositoCaja (
+    DepositoID INT IDENTITY(1,1) NOT NULL,
+    EmpleadoID INT NOT NULL, 
+    CuentaID INT NOT NULL,   
+    Fecha DATETIME NOT NULL DEFAULT GETDATE(),
+    MontoTotal FLOAT NOT NULL CONSTRAINT chk_monto_dep CHECK (MontoTotal > 0),
+    NumeroReferencia VARCHAR(50) NOT NULL,
+    CONSTRAINT pk_depositoscaja PRIMARY KEY(DepositoID),
+    CONSTRAINT fk_dep_empleado FOREIGN KEY(EmpleadoID) REFERENCES Empleado(EmpleadoID),
+    CONSTRAINT fk_dep_cuentas FOREIGN KEY(CuentaID) REFERENCES Cuentas(CuentaID)
+)
+GO
