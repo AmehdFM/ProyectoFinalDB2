@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ProyectoFinalDB2
@@ -15,16 +9,59 @@ namespace ProyectoFinalDB2
         public Form1()
         {
             InitializeComponent();
+            ConfigurarDiseñoInicio();
+        }
+
+        private void ConfigurarDiseñoInicio()
+        {
+            // Configuración de la Ventana
+            this.Text = "Inversiones Maya - Inicio";
+            this.Size = new Size(500, 400);
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.BackColor = Color.FromArgb(45, 52, 54); // Gris oscuro elegante
+
+            // Etiqueta de Título
+            Label lblTitulo = new Label();
+            lblTitulo.Text = "INVERSIONES MAYA";
+            lblTitulo.ForeColor = Color.White;
+            lblTitulo.Font = new Font("Segoe UI", 24, FontStyle.Bold);
+            lblTitulo.Size = new Size(400, 50);
+            lblTitulo.Location = new Point(50, 100);
+            lblTitulo.TextAlign = ContentAlignment.MiddleCenter;
+
+            // Botón de Entrar
+            Button btnEntrar = new Button();
+            btnEntrar.Text = "ENTRAR AL SISTEMA";
+            btnEntrar.Size = new Size(200, 45);
+            btnEntrar.Location = new Point(150, 220);
+            btnEntrar.Cursor = Cursors.Hand;
+            btnEntrar.FlatStyle = FlatStyle.Flat;
+            btnEntrar.FlatAppearance.BorderSize = 0;
+            btnEntrar.BackColor = Color.FromArgb(0, 184, 148); // Verde esmeralda
+            btnEntrar.ForeColor = Color.White;
+            btnEntrar.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+
+            // Evento Click para pasar al Panel Principal
+            btnEntrar.Click += (s, e) => {
+                PanelPrincipal panel = new PanelPrincipal();
+                panel.Show();
+                this.Hide(); // Ocultamos la pantalla de inicio
+            };
+
+            this.Controls.Add(lblTitulo);
+            this.Controls.Add(btnEntrar);
+        }
+
+        // Eventos requeridos por el diseñador
+        private void Crear_Click(object sender, EventArgs e)
+        {
+            // Implementación mínima para evitar errores de compilación.
+            // Aquí se puede agregar la lógica de guardado.
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
-        }
-
-        private void Crear_Click(object sender, EventArgs e)
-        {
-
+            // Inicializaciones en carga si son necesarias.
         }
     }
 }
