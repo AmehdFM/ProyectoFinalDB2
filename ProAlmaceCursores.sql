@@ -1,188 +1,152 @@
---spRegistrarVenta
-create or alter procedure spRegistrarVenta
-    @clienteid int, 
-    @loteid int, 
-    @empleadoid int, 
-    @tipoVenta varchar(10), 
-    @prima float, 
-    @plazo int, 
-    @interes float
-as
-begin
-    begin transaction
-    declare @ventaID int, @err int = 0, @etapaID int, @cuotaNumero int, @montoCuota float
-    declare @fechaVencimiento datetime, @capital float, @interesCuota float
+CREATE OR ALTER PROCEDURE sp_GenerarReporteMorosidadMasiva
+AS
+BEGIN
 
-    -- Obtener el EtapaID desde la tabla Bloque
-    select @etapaID = EtapaID from Bloque where BloqueID = (select BloqueID from Lote where LoteID = @loteid)
+    -- Declaración de variables para almacenar los datos procesados por el cursor
+    DECLARE @ClienteID INT
+    DECLARE @Nombre VARCHAR(100)
+    DECLARE @SaldoPendiente FLOAT
+    DECLARE @EsMoroso BIT
 
-    -- Insertar venta
-    insert into Venta (LoteID, ClienteID, EmpleadoID, Tipo, Prima, Plazo, Interes)
-    values (@loteid, @clienteid, @empleadoid, @tipoVenta, @prima, @plazo, @interes)
-    
-    if @@ERROR != 0 
-    begin
-        set @err = -1
-        rollback
-        return
-    end
+    -- Definición del cursor con el prefijo cr_ solicitado
+    DECLARE cr_Clientes CURSOR FOR 
+    SELECT ClienteID, Nombre FROM Cliente
 
-    -- Obtener el ID de la venta insertada
-    select @ventaID = scope_identity()
+    -- Apertura del cursor para iniciar el recorrido
+    OPEN cr_Clientes
 
-    -- Inicializar cursor para recorrer las cuotas
-    declare cuota_cursor cursor for
-    select top(@plazo) row_number() over (order by (select null)) as CuotaNumero
-    from master.dbo.spt_values -- Dummy table for row numbers (replace with a suitable table)
-    
-    open cuota_cursor
-    fetch next from cuota_cursor into @cuotaNumero
+    -- Captura de la primera fila de la tabla clientes
+    FETCH NEXT FROM cr_Clientes INTO @ClienteID, @Nombre
 
-    while @@FETCH_STATUS = 0
-    begin
-        set @montoCuota = (@prima + (select Area from Lote where LoteID = @loteid) * @interes) / @plazo
-        set @capital = @montoCuota * 0.8
-        set @interesCuota = @montoCuota * 0.2
-        set @fechaVencimiento = dateadd(month, @cuotaNumero, getdate())
+    -- Ciclo de procesamiento mientras existan registros (@@FETCH_STATUS = 0)
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        -- Verificamos si el cliente tiene cuotas vencidas usando la función de mora [2]
+        SET @EsMoroso = dbo.fnEsClienteMoroso(@ClienteID)
 
-        -- Insertar plan de pago para la cuota
-        insert into PlanPago (VentaID, CuotaNumero, FechaVencimiento, Monto, Capital, Interes)
-        values (@ventaID, @cuotaNumero, @fechaVencimiento, @montoCuota, @capital, @interesCuota)
+        IF @EsMoroso = 1
+        BEGIN
+            -- Obtenemos el monto total adeudado mediante la función de saldo [3]
+            SET @SaldoPendiente = dbo.fnSaldoPendiente(@ClienteID)
 
-        if @@ERROR != 0 
-        begin
-            set @err = -1
-            rollback
-            return
-        end
+            -- Generamos el reporte individual en la consola de mensajes
+            PRINT 'AVISO DE COBRO - Cliente: ' + @Nombre + 
+                  ' (ID: ' + CAST(@ClienteID AS VARCHAR) + ') ' +
+                  'Deuda Pendiente: L. ' + CAST(@SaldoPendiente AS VARCHAR)
+        END
 
-        fetch next from cuota_cursor into @cuotaNumero
-    end
+        -- Avanzamos a la siguiente fila del cursor
+        FETCH NEXT FROM cr_Clientes INTO @ClienteID, @Nombre
+    END
 
-    close cuota_cursor
-    deallocate cuota_cursor
+    -- Cierre y liberación de recursos del cursor
+    CLOSE cr_Clientes
+    DEALLOCATE cr_Clientes
+END
+GO
 
-    -- Actualizar el estado del lote
-    update Lote set Estado = 'Vendido' where LoteID = @loteid
 
-    if @@ERROR != 0
-    begin
-        set @err = -1
-        rollback
-        return
-    end
+CREATE OR ALTER PROCEDURE sp_AjustePreciosLotesDisponibles
+    @EtapaID INT,
+    @IncrementoVara FLOAT
+AS
+BEGIN
+    SET NOCOUNT ON
 
-    -- Commit si todo fue exitoso
-    if @err = 0
-        commit
-    else
-        rollback
-end
-go
+    -- DECLARAMOS LAS VARIABLES PARA EL MANEJO DE DATOS
+    DECLARE @LoteID INT
+    DECLARE @Area FLOAT
+    DECLARE @PrecioVaraActual FLOAT
+    DECLARE @NuevoValorProyectado FLOAT
 
--- Procedimiento almacenado para registrar un pago
-create or alter procedure spRegistrarPago
-    @ventaID int, 
-    @montoPagado float, 
-    @empleadoID int, 
-    @tipoPago varchar(20), 
-    @cuotaNumero int
-as
-begin
-    begin transaction
-    declare @pagoID int, @planPagoID int, @err int = 0, @estadoPago varchar(20)
+    -- DEFINIMOS EL CURSOR CON EL PREFIJO CR_
+    -- SELECCIONA LOTES DISPONIBLES QUE SON DE ESQUINA EN UNA ETAPA ESPECÍFICA
+    DECLARE cr_LotesReval CURSOR FOR 
+    SELECT L.LoteID, L.Area, E.PrecioVara
+    FROM Lote L
+    INNER JOIN Bloque B ON L.BloqueID = B.BloqueID
+    INNER JOIN Etapa E ON B.EtapaID = E.EtapaID
+    WHERE E.EtapaID = @EtapaID 
+    AND L.Estado = 'Disponible'
+    AND L.Esquina = 1 -- CONDICIÓN ADICIONAL SOLICITADA
 
-    -- Obtener el Plan de Pago correspondiente
-    select @planPagoID = pp.PlanPagoID from PlanPago pp
-    join Venta v on pp.VentaID = v.VentaID
-    where v.VentaID = @ventaID and pp.CuotaNumero = @cuotaNumero
+    -- APERTURA DEL DISPOSITIVO DE CONTROL
+    OPEN cr_LotesReval
 
-    if @@ERROR != 0 or @planPagoID is null
-    begin
-        set @err = -1
-        rollback
-        return
-    end
+    -- CAPTURA DE LA PRIMERA FILA
+    FETCH NEXT FROM cr_LotesReval INTO @LoteID, @Area, @PrecioVaraActual
 
-    -- Insertar el pago
-    insert into Pago (VentaID, PlanPagoID, EmpleadoID, MontoPagado, TipoPago, FechaPago)
-    values (@ventaID, @planPagoID, @empleadoID, @montoPagado, @tipoPago, getdate())
-    
-    if @@ERROR != 0
-    begin
-        set @err = -1
-        rollback
-        return
-    end
+    -- CICLO DE PROCESAMIENTO MIENTRAS EXISTAN REGISTROS
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        -- CALCULAMOS EL NUEVO VALOR APLICANDO EL INCREMENTO A LA VARA CUADRADA
+        -- SE INCLUYE EL 10% ADICIONAL POR SER DE ESQUINA SEGÚN LA LÓGICA FINANCIERA
+        SET @NuevoValorProyectado = (@Area * (@PrecioVaraActual + @IncrementoVara)) * 1.10
 
-    -- Usamos cursor para actualizar los pagos y estado
-    declare pago_cursor cursor for
-    select Estado from PlanPago where PlanPagoID = @planPagoID
-    
-    open pago_cursor
-    fetch next from pago_cursor into @estadoPago
+        -- GENERAMOS EL REPORTE DE REVALUACIÓN PROYECTADA
+        PRINT 'ANÁLISIS DE PLUSVALÍA - Lote ID: ' + CAST(@LoteID AS VARCHAR) + 
+              ' | Área: ' + CAST(@Area AS VARCHAR) + ' v2' +
+              ' | Nuevo Valor Estimado: L. ' + CAST(@NuevoValorProyectado AS VARCHAR)
 
-    while @@FETCH_STATUS = 0
-    begin
-        if @estadoPago != 'Pagado'
-        begin
-            update PlanPago set Estado = 'Pagado' where PlanPagoID = @planPagoID
-        end
-        fetch next from pago_cursor into @estadoPago
-    end
+        -- AVANZAMOS A LA SIGUIENTE FILA DEL CURSOR
+        FETCH NEXT FROM cr_LotesReval INTO @LoteID, @Area, @PrecioVaraActual
+    END
 
-    close pago_cursor
-    deallocate pago_cursor
+    -- CIERRE Y LIBERACIÓN DE RECURSOS
+    CLOSE cr_LotesReval
+    DEALLOCATE cr_LotesReval
+END
+GO
 
-    -- Commit si todo fue exitoso
-    if @err = 0
-        commit
-    else
-        rollback
-end
-go
 
--- Procedimiento almacenado para registrar un gasto en un proyecto
-create or alter procedure spRegistrarGasto
-    @proyectoID int,
-    @concepto varchar(100),
-    @monto float
-as
-begin
-    begin transaction
-    declare @gastoID int, @err int = 0
+CREATE OR ALTER PROCEDURE sp_ConsolidarPagosDiariosCaja
+AS
+BEGIN
+    SET NOCOUNT ON
 
-    -- Insertar el gasto
-    insert into Gastos (ProyectoID, Concepto, Monto)
-    values (@proyectoID, @concepto, @monto)
-    
-    if @@ERROR != 0
-    begin
-        set @err = -1
-        rollback
-        return
-    end
+    -- 1. DECLARAMOS UNA VARIABLE TIPO TABLA PARA ALMACENAR LOS RESULTADOS
+    -- ESTO PERMITE QUE EL RESULTADO FINAL SE VEA COMO UNA TABLA FÍSICA [3, 6]
+    DECLARE @ReporteFinal TABLE (
+        Banco VARCHAR(50),
+        NumeroCuenta VARCHAR(50),
+        MontoTotal FLOAT
+    )
 
-    -- Usar un cursor para actualizar el estado del gasto en el proyecto
-    declare gasto_cursor cursor for
-    select ProyectoID from Gastos where GastoID = scope_identity()
-    
-    open gasto_cursor
-    fetch next from gasto_cursor into @proyectoID
+    -- DECLARAMOS LAS VARIABLES PARA EL TRABAJO DEL CURSOR
+    DECLARE @CuentaID INT
+    DECLARE @Banco VARCHAR(50)
+    DECLARE @NumeroCuenta VARCHAR(50)
+    DECLARE @MontoConsolidado FLOAT
 
-    while @@FETCH_STATUS = 0
-    begin
-        -- Realizar cualquier operación adicional con el gasto registrado
-        fetch next from gasto_cursor into @proyectoID
-    end
+    -- 2. DEFINIMOS EL CURSOR CON EL PREFIJO CR_
+    DECLARE cr_PagosDiarios CURSOR FOR 
+    SELECT 
+        C.CuentaID, 
+        C.Banco, 
+        C.NumeroCuenta, 
+        SUM(P.MontoPagado)
+    FROM Pago P
+    INNER JOIN Cuenta C ON P.CuentaID = C.CuentaID
+    WHERE CAST(P.FechaPago AS DATE) = CAST(GETDATE() AS DATE)
+    AND P.TipoPago = 'Efectivo'
+    GROUP BY C.CuentaID, C.Banco, C.NumeroCuenta
 
-    close gasto_cursor
-    deallocate gasto_cursor
+    OPEN cr_PagosDiarios
 
-    -- Commit si todo fue exitoso
-    if @err = 0
-        commit
-    else
-        rollback
-end
-go
+    FETCH NEXT FROM cr_PagosDiarios INTO @CuentaID, @Banco, @NumeroCuenta, @MontoConsolidado
+
+    -- 3. CICLO DE PROCESAMIENTO
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        INSERT INTO @ReporteFinal (Banco, NumeroCuenta, MontoTotal)
+        VALUES (@Banco, @NumeroCuenta, @MontoConsolidado)
+
+        FETCH NEXT FROM cr_PagosDiarios INTO @CuentaID, @Banco, @NumeroCuenta, @MontoConsolidado
+    END
+
+    CLOSE cr_PagosDiarios
+    DEALLOCATE cr_PagosDiarios
+
+    SELECT * FROM @ReporteFinal
+END
+GO

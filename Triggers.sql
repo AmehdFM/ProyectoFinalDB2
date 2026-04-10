@@ -59,60 +59,41 @@ END
 GO
 
 -- Triger para generar el plan de pago luego de ejecutarse una venta
-CREATE OR ALTER TRIGGER tr_GenerarPlanPago ON Venta AFTER INSERT
-AS
-BEGIN
+create or alter trigger tr_GenerarPlanPago
+on Venta
+after insert
+as
+begin
+    declare @VentaID int, @LoteID int, @Plazo int, @Interes float, @Prima float
+    declare @MontoTotal float, @MontoFinanciar float
 
-    DECLARE @VentaID INT, 
-            @LoteID INT,
-            @Tipo VARCHAR(10), 
-            @Prima FLOAT, 
-            @InteresVenta FLOAT, 
-            @Plazo INT,
-            @ValorLote FLOAT;
+    -- obtenemos los datos de la venta recién insertada
+    select 
+        @VentaID = VentaID, 
+        @LoteID = LoteID, 
+        @Plazo = Plazo, 
+        @Interes = Interes, 
+        @Prima = Prima 
+    from inserted
 
-    DECLARE cr_Ventas CURSOR FOR 
-    SELECT VentaID, LoteID, Tipo, ISNULL(Prima, 0), Interes, Plazo 
-    FROM inserted;
+    set @MontoTotal = dbo.fnValorLote(@LoteID)
+    set @MontoFinanciar = @MontoTotal - @Prima
 
-    OPEN cr_Ventas;
-    FETCH NEXT FROM cr_Ventas INTO @VentaID, @LoteID, @Tipo, @Prima, @InteresVenta, @Plazo;
 
-    WHILE @@FETCH_STATUS = 0
-    BEGIN
+    insert into PlanPago (VentaID, CuotaNumero, FechaVencimiento, Monto, Capital, Interes, Estado)
+    select 
+        @VentaID, 
+        CuotaNumero, 
+        FechaVencimiento, 
+        MontoCuota, 
+        Capital, 
+        Interes, 
+        'Pendiente'
+    from dbo.f_GenerarCuotas(@MontoFinanciar, @Interes, @Plazo)
+end
+go
 
-        IF @Tipo = 'Crédito'
-        BEGIN
-
-            SELECT @ValorLote = (L.Area * E.PrecioVara)
-            FROM Lote L
-            INNER JOIN Bloque B ON L.BloqueID = B.BloqueID
-            INNER JOIN Etapa E ON B.EtapaID = E.EtapaID
-            WHERE L.LoteID = @LoteID;
-
-            DECLARE @MontoFinanciar FLOAT = @ValorLote - @Prima;
-
-            INSERT INTO PlanPago (VentaID, CuotaNumero, FechaVencimiento, Monto, Capital, Interes, Estado)
-            SELECT 
-                @VentaID, 
-                f.CuotaNumero, 
-                f.FechaVencimiento, 
-                f.MontoCuota, 
-                f.Capital, 
-                f.Interes, 
-                'Pendiente'
-            FROM dbo.f_GenerarCuotas(@MontoFinanciar, @InteresVenta, @Plazo) f;
-        END
-
-        FETCH NEXT FROM cr_Ventas INTO @VentaID, @LoteID, @Tipo, @Prima, @InteresVenta, @Plazo;
-    END
-
-    CLOSE cr_Ventas;
-    DEALLOCATE cr_Ventas;
-END
-GO
-
-CREATE TRIGGER tr_ValidarEliminarLote ON Lote FOR DELETE 
+CREATE OR ALTER TRIGGER tr_ValidarEliminarLote ON Lote FOR DELETE 
 AS
 BEGIN
     IF EXISTS (SELECT 1 FROM deleted WHERE Estado = 'Vendido')
@@ -123,7 +104,7 @@ END
 GO
 
 
-CREATE TRIGGER tr_PrevenirCambioVenta ON Venta FOR UPDATE
+CREATE OR ALTER TRIGGER tr_PrevenirCambioVenta ON Venta FOR UPDATE
 AS
 BEGIN
     IF UPDATE(Plazo) OR UPDATE(Interes) OR UPDATE(LoteID)
@@ -133,7 +114,7 @@ BEGIN
 END
 GO
 
-CREATE TRIGGER tr_ProteccionProyectos ON Proyecto FOR DELETE
+CREATE OR ALTER TRIGGER tr_ProteccionProyectos ON Proyecto FOR DELETE
 AS
 BEGIN
     IF EXISTS (SELECT 1 FROM Etapa WHERE ProyectoID IN (SELECT ProyectoID FROM deleted))
@@ -143,7 +124,7 @@ BEGIN
 END
 GO
 
-CREATE TRIGGER tr_ReversarEstadoLote
+CREATE OR ALTER TRIGGER tr_ReversarEstadoLote
 ON Venta
 AFTER DELETE
 AS
@@ -156,7 +137,7 @@ BEGIN
 END
 GO
 
-CREATE TRIGGER tr_ReversarPagoPlan
+CREATE OR ALTER TRIGGER tr_ReversarPagoPlan
 ON Pago
 AFTER DELETE
 AS
@@ -169,7 +150,7 @@ BEGIN
 END
 GO
 
-CREATE TRIGGER tr_LimpiarPlanVenta
+CREATE OR ALTER TRIGGER tr_LimpiarPlanVenta
 ON Venta
 AFTER DELETE
 AS
