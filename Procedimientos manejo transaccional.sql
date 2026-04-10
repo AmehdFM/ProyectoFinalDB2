@@ -4,30 +4,47 @@
 --Todo esto debe hacerse en una transacción para asegurar que
 --no queden registros inconsistentes si ocurre un error.
 
-create or alter procedure spRegistrarVenta
-    @LoteID int, @ClienteID int, @EmpleadoID int, @AvalID int = null,
-    @BeneficiarioID int = null, @TipoPago varchar(10), @Prima float = 0,
-    @Plazo int, @Interes float
-as
-begin
+CREATE OR ALTER PROCEDURE spRegistrarVenta
+    @LoteID INT, @ClienteID INT, @EmpleadoID INT, @AvalID INT = NULL,
+    @BeneficiarioID INT = NULL, @TipoPago VARCHAR(10), @Prima FLOAT = 0,
+    @Plazo INT, @Interes FLOAT
+AS
+BEGIN
+    -- 1. VALIDACIÓN DEL PLAZO MÁXIMO SEGÚN EL PROYECTO
+    DECLARE @PlazoMaximoPermitido INT
 
-    begin transaction
+    SELECT @PlazoMaximoPermitido = P.PlazoMaximo
+    FROM Proyecto P
+    INNER JOIN Etapa E ON P.ProyectoID = E.ProyectoID
+    INNER JOIN Bloque B ON E.EtapaID = B.EtapaID
+    INNER JOIN Lote L ON B.BloqueID = L.BloqueID
+    WHERE L.LoteID = @LoteID
 
-    -- el insert disparará automáticamente los triggers tr_ActualizarEstadoLote y tr_GenerarPlanPago
-    insert into Venta (LoteID, ClienteID, EmpleadoID, AvalID, BeneficiarioID, Tipo, Prima, Plazo, Interes)
-    values (@LoteID, @ClienteID, @EmpleadoID, @AvalID, @BeneficiarioID, @TipoPago, @Prima, @Plazo, @Interes);
+    -- SI EL PLAZO EXCEDE EL LÍMITE, DETENEMOS LA OPERACIÓN ANTES DE INICIAR LA TRANSACCIÓN
+    IF @Plazo > @PlazoMaximoPermitido
+    BEGIN
+        RETURN
+    END
 
-    -- validamos si ocurrió un error durante el insert o en la ejecución de los triggers
-    if @@error <> 0
-    begin
-        rollback transaction
-    end
-    else
-    begin
-        commit transaction;
-    end
-end
-go
+    -- 2. INICIO DEL MANEJO TRANSACCIONAL
+    BEGIN TRANSACTION
+
+    -- EL INSERT DISPARARÁ AUTOMÁTICAMENTE LOS TRIGGERS tr_ActualizarEstadoLote Y tr_GenerarPlanPago
+    INSERT INTO Venta (LoteID, ClienteID, EmpleadoID, AvalID, BeneficiarioID, Tipo, Prima, Plazo, Interes)
+    VALUES (@LoteID, @ClienteID, @EmpleadoID, @AvalID, @BeneficiarioID, @TipoPago, @Prima, @Plazo, @Interes)
+
+    -- 3. VALIDACIÓN DE INTEGRIDAD Y ERRORES (TODO O NADA)
+    IF @@ERROR <> 0
+    BEGIN
+        ROLLBACK TRANSACTION
+
+    END
+    ELSE
+    BEGIN
+        COMMIT TRANSACTION
+    END
+END
+GO
 
 --2) Registrar Pago de una Cuota con Factura
 --Cuando se recibe un pago, se debe registrar el pago, actualizar el plan de pago,

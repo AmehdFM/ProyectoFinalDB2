@@ -93,7 +93,7 @@ begin
 end
 go
 
-CREATE TRIGGER tr_ValidarEliminarLote ON Lote FOR DELETE 
+CREATE OR ALTER TRIGGER tr_ValidarEliminarLote ON Lote FOR DELETE 
 AS
 BEGIN
     IF EXISTS (SELECT 1 FROM deleted WHERE Estado = 'Vendido')
@@ -104,7 +104,7 @@ END
 GO
 
 
-CREATE TRIGGER tr_PrevenirCambioVenta ON Venta FOR UPDATE
+CREATE OR ALTER TRIGGER tr_PrevenirCambioVenta ON Venta FOR UPDATE
 AS
 BEGIN
     IF UPDATE(Plazo) OR UPDATE(Interes) OR UPDATE(LoteID)
@@ -114,7 +114,7 @@ BEGIN
 END
 GO
 
-CREATE TRIGGER tr_ProteccionProyectos ON Proyecto FOR DELETE
+CREATE OR ALTER TRIGGER tr_ProteccionProyectos ON Proyecto FOR DELETE
 AS
 BEGIN
     IF EXISTS (SELECT 1 FROM Etapa WHERE ProyectoID IN (SELECT ProyectoID FROM deleted))
@@ -124,7 +124,7 @@ BEGIN
 END
 GO
 
-CREATE TRIGGER tr_ReversarEstadoLote
+CREATE OR ALTER TRIGGER tr_ReversarEstadoLote
 ON Venta
 AFTER DELETE
 AS
@@ -137,7 +137,7 @@ BEGIN
 END
 GO
 
-CREATE TRIGGER tr_ReversarPagoPlan
+CREATE OR ALTER TRIGGER tr_ReversarPagoPlan
 ON Pago
 AFTER DELETE
 AS
@@ -150,7 +150,7 @@ BEGIN
 END
 GO
 
-CREATE TRIGGER tr_LimpiarPlanVenta
+CREATE OR ALTER TRIGGER tr_LimpiarPlanVenta
 ON Venta
 AFTER DELETE
 AS
