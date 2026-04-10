@@ -1,0 +1,61 @@
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace ProyectoFinalDB2
+{
+    public class FormEmpleado : Form
+    {
+        public FormEmpleado(string titulo)
+        {
+            this.Text = titulo;
+            this.Size = new Size(400, 450);
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            ConfigurarCampos();
+        }
+
+        private void ConfigurarCampos()
+        {
+            int y = 30;
+            string[] etiquetas = { "Nombre:", "Identidad:", "Cargo:", "Salario:", "Teléfono:" };
+
+            foreach (var texto in etiquetas)
+            {
+                Label lbl = new Label
+                {
+                    Text = texto,
+                    Location = new Point(30, y),
+                    AutoSize = true,
+                    Font = new Font("Segoe UI", 10)
+                };
+
+                TextBox txt = new TextBox
+                {
+                    Location = new Point(30, y + 25),
+                    Size = new Size(320, 25),
+                    Font = new Font("Segoe UI", 10)
+                };
+
+                this.Controls.Add(lbl);
+                this.Controls.Add(txt);
+                y += 65;
+            }
+
+            Button btnGuardar = new Button
+            {
+                Text = "Guardar Cambios",
+                Location = new Point(100, y + 10),
+                Size = new Size(180, 40),
+                BackColor = Color.FromArgb(44, 62, 80),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold)
+            };
+            btnGuardar.Click += (s, e) => { this.Close(); };
+
+            this.Controls.Add(btnGuardar);
+        }
+    }
+}

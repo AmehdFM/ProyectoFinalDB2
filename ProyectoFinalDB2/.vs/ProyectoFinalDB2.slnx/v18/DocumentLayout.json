@@ -1,13 +1,10 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\User\\source\\repos\\ProyectoFinalDB2\\",
+  "WorkspaceRootPath": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6A7147B0-40CB-4A94-B392-E606C9A2F0C0}|ProyectoFinalDB2\\ProyectoFinalDB2.csproj|c:\\users\\user\\source\\repos\\proyectofinaldb2\\proyectofinaldb2\\cruds\\etapa.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{6A7147B0-40CB-4A94-B392-E606C9A2F0C0}|ProyectoFinalDB2\\ProyectoFinalDB2.csproj|solutionrelative:proyectofinaldb2\\cruds\\etapa.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6A7147B0-40CB-4A94-B392-E606C9A2F0C0}|ProyectoFinalDB2\\ProyectoFinalDB2.csproj|c:\\users\\user\\desktop\\proyectofinaldb2\\proyectofinaldb2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\Form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -17,31 +14,20 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ProyectoFinalDB2.cs [Dise\u00F1o]",
-              "DocumentMoniker": "C:\\Users\\User\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2.cs",
-              "RelativeDocumentMoniker": "..\\..\\..\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2.cs",
-              "ToolTip": "C:\\Users\\User\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2.cs [Dise\u00F1o]",
-              "RelativeToolTip": "..\\..\\..\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2.cs [Dise\u00F1o]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-10T06:01:14.597Z",
-              "EditorCaption": " [Dise\u00F1o]"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Etapa.cs [Dise\u00F1o]",
-              "DocumentMoniker": "C:\\Users\\User\\source\\repos\\ProyectoFinalDB2\\ProyectoFinalDB2\\Cruds\\Etapa.cs",
-              "RelativeDocumentMoniker": "ProyectoFinalDB2\\Cruds\\Etapa.cs",
-              "ToolTip": "C:\\Users\\User\\source\\repos\\ProyectoFinalDB2\\ProyectoFinalDB2\\Cruds\\Etapa.cs [Dise\u00F1o]",
-              "RelativeToolTip": "ProyectoFinalDB2\\Cruds\\Etapa.cs [Dise\u00F1o]",
+              "Title": "Form1.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\Form1.cs",
+              "RelativeDocumentMoniker": "Form1.cs",
+              "ToolTip": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\Form1.cs",
+              "RelativeToolTip": "Form1.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAAABsAAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-10T05:34:17.871Z",
-              "EditorCaption": " [Dise\u00F1o]"
+              "WhenOpened": "2026-04-10T07:25:00.161Z",
+              "EditorCaption": ""
             }
           ]
         }
