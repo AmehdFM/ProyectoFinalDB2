@@ -16,8 +16,6 @@ namespace ProyectoFinalDB2
             // --- CONFIGURACIÓN DE VENTANA ---
             this.Text = "Inversiones Maya - Dashboard";
             this.Size = new Size(1100, 700);
-            // Abrir en pantalla completa (maximizado)
-            this.WindowState = FormWindowState.Maximized;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(240, 242, 245); // Gris claro moderno
             this.Font = new Font("Segoe UI", 10);
@@ -94,11 +92,6 @@ namespace ProyectoFinalDB2
                 if (texto == "EMPLEADOS")
                 {
                     SeccionEmpleados seccion = new SeccionEmpleados();
-                    seccion.ShowDialog();
-                }
-                else if (texto == "PROYECTOS")
-                {
-                    SeccionProyectos seccion = new SeccionProyectos();
                     seccion.ShowDialog();
                 }
                 else
