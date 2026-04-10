@@ -26,7 +26,7 @@ CREATE TABLE Bloque (
     EtapaID INT NOT NULL,
     NumeroBloque INT NOT NULL,
     CONSTRAINT pk_bloques PRIMARY KEY(BloqueID),
-    CONSTRAINT fk_bloques_etapas FOREIGN KEY(EtapaID) REFERENCES Etapas(EtapaID)
+    CONSTRAINT fk_bloques_etapas FOREIGN KEY(EtapaID) REFERENCES Etapa(EtapaID)
 )
 GO
 
