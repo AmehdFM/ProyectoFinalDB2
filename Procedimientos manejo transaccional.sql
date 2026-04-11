@@ -111,3 +111,218 @@ begin
     end
 end
 go
+
+
+
+--------------------------------------------
+CREATE PROCEDURE spCrearProyecto
+    @Nombre VARCHAR(100),
+    @Departamento VARCHAR(50),
+    @Municipio VARCHAR(50),
+    @PlazoMaximo INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Validaciones
+    IF LTRIM(RTRIM(@Nombre)) = ''
+    BEGIN
+        RAISERROR('El nombre del proyecto no puede estar vacío.', 16, 1);
+        RETURN;
+    END
+
+    IF @PlazoMaximo <= 0
+    BEGIN
+        RAISERROR('El plazo máximo debe ser mayor a 0.', 16, 1);
+        RETURN;
+    END
+
+    IF EXISTS (SELECT 1 FROM Proyecto WHERE Nombre = @Nombre)
+    BEGIN
+        RAISERROR('Ya existe un proyecto con ese nombre.', 16, 1);
+        RETURN;
+    END
+
+    -- Inserción
+    INSERT INTO Proyecto (Nombre, Departamento, Municipio, PlazoMaximo)
+    VALUES (@Nombre, @Departamento, @Municipio, @PlazoMaximo);
+
+    -- Retornar el ID generado
+    SELECT 
+        SCOPE_IDENTITY() AS ProyectoID,
+        @Nombre AS Nombre,
+        @Departamento AS Departamento,
+        @Municipio AS Municipio,
+        @PlazoMaximo AS PlazoMaximo,
+        'Proyecto creado exitosamente.' AS Mensaje;
+END
+GO
+
+create procedure sp_CrearEtapa
+    @ProyectoID int,
+    @Nombre varchar(100),
+    @PrecioVara float,
+    @Interes float,
+    @AreaVerde float
+as
+begin
+    set nocount on;
+
+    if not exists (select 1 from Proyecto where ProyectoID = @ProyectoID)
+    begin
+        raiserror('El proyecto especificado no existe.', 16, 1);
+        return;
+    end
+
+    if @PrecioVara <= 0
+    begin
+        raiserror('El precio por vara debe ser mayor a 0.', 16, 1);
+        return;
+    end
+
+    if @Interes < 0
+    begin
+        raiserror('El interés no puede ser negativo.', 16, 1);
+        return;
+    end
+
+    if @AreaVerde < 0 or @AreaVerde > 1
+    begin
+        raiserror('El área verde debe estar entre 0 y 1.', 16, 1);
+        return;
+    end
+
+    insert into Etapa (ProyectoID, Nombre, PrecioVara, Interes, AreaVerde)
+    values (@ProyectoID, @Nombre, @PrecioVara, @Interes, @AreaVerde);
+
+    select scope_identity() as EtapaID, 'Etapa creada exitosamente.' as Mensaje;
+end
+go
+
+create procedure sp_CrearBloque
+    @EtapaID int,
+    @NumeroBloque int
+as
+begin
+    set nocount on;
+
+    if not exists (select 1 from Etapa where EtapaID = @EtapaID)
+    begin
+        raiserror('La etapa especificada no existe.', 16, 1);
+        return;
+    end
+
+    if exists (select 1 from Bloque where EtapaID = @EtapaID and NumeroBloque = @NumeroBloque)
+    begin
+        raiserror('Ya existe un bloque con ese número en la etapa especificada.', 16, 1);
+        return;
+    end
+
+    insert into Bloque (EtapaID, NumeroBloque)
+    values (@EtapaID, @NumeroBloque);
+
+    select scope_identity() as BloqueID, 'Bloque creado exitosamente.' as Mensaje;
+end
+go
+
+create procedure sp_CrearLote
+    @BloqueID int,
+    @Numero int,
+    @Area float,
+    @Catastro varchar(50),
+    @Matricula varchar(50),
+    @Colindancias varchar(max),
+    @Esquina bit,
+    @Parque bit,
+    @CalleCerrada bit
+as
+begin
+    set nocount on;
+
+    if not exists (select 1 from Bloque where BloqueID = @BloqueID)
+    begin
+        raiserror('El bloque especificado no existe.', 16, 1);
+        return;
+    end
+
+    if @Area <= 0
+    begin
+        raiserror('El área debe ser mayor a 0.', 16, 1);
+        return;
+    end
+
+    if exists (select 1 from Lote where BloqueID = @BloqueID and Numero = @Numero)
+    begin
+        raiserror('Ya existe un lote con ese número en el bloque especificado.', 16, 1);
+        return;
+    end
+
+    insert into Lote (BloqueID, Numero, Area, Catastro, Matricula, Colindancias, Esquina, Parque, CalleCerrada, Estado)
+    values (@BloqueID, @Numero, @Area, @Catastro, @Matricula, @Colindancias, @Esquina, @Parque, @CalleCerrada, 'Disponible');
+
+    select scope_identity() as LoteID, 'Lote creado exitosamente.' as Mensaje;
+end
+go
+
+create or alter procedure sp_CrearVenta
+    @LoteID int,
+    @ClienteID int,
+    @EmpleadoID int,
+    @AvalID int = null,
+    @BeneficiarioID int = null,
+    @Tipo varchar(10),
+    @Prima float,
+    @Plazo int,
+    @Interes float
+as
+begin
+    set nocount on;
+
+    if not exists (select 1 from Lote where LoteID = @LoteID and Estado = 'Disponible')
+    begin
+        raiserror('El lote no existe o no está disponible.', 16, 1);
+        return;
+    end
+
+    if not exists (select 1 from Cliente where ClienteID = @ClienteID)
+    begin
+        raiserror('El cliente especificado no existe.', 16, 1);
+        return;
+    end
+
+    if not exists (select 1 from Empleado where EmpleadoID = @EmpleadoID)
+    begin
+        raiserror('El empleado especificado no existe.', 16, 1);
+        return;
+    end
+
+    if @Tipo not in ('Contado', 'Credito')
+    begin
+        raiserror('El tipo de venta debe ser Contado o Credito.', 16, 1);
+        return;
+    end
+
+    if @Prima < 0
+    begin
+        raiserror('La prima no puede ser negativa.', 16, 1);
+        return;
+    end
+
+    if @Plazo <= 0
+    begin
+        raiserror('El plazo debe ser mayor a 0.', 16, 1);
+        return;
+    end
+
+    if @Interes < 0
+    begin
+        raiserror('El interés no puede ser negativo.', 16, 1);
+        return;
+    end
+
+    insert into Venta (LoteID, ClienteID, EmpleadoID, AvalID, BeneficiarioID, Tipo, Prima, Plazo, Interes)
+    values (@LoteID, @ClienteID, @EmpleadoID, @AvalID, @BeneficiarioID, @Tipo, @Prima, @Plazo, @Interes);
+
+    select scope_identity() as VentaID, 'Venta registrada exitosamente.' as Mensaje;
+end
+go

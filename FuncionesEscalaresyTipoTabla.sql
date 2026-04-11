@@ -198,3 +198,54 @@ return
     where g.ProyectoID = @ProyectoID
 )
 go
+
+create or alter function fn_ObtenerEtapasPorProyecto(@ProyectoID int)
+returns table
+as
+return (
+    select
+        Nombre as 'Nombre',
+        PrecioVara as 'Precio x Vara',
+        Interes as 'Interés (%)',
+        AreaVerde as 'Área Verde (%)'
+    from Etapa
+    where ProyectoID = @ProyectoID
+)
+go
+
+create or alter function fn_ObtenerBloquesPorProyecto(@ProyectoID int)
+returns table
+as
+return (
+    select
+        E.Nombre as 'Etapa',
+        B.NumeroBloque as 'Número de Bloque'
+    from Bloque B
+    join Etapa E on B.EtapaID = E.EtapaID
+    where E.ProyectoID = @ProyectoID
+)
+go
+
+create or alter function fn_ObtenerLotesPorProyecto(@ProyectoID int)
+returns table
+as
+return (
+    select
+        L.LoteID,
+        E.Nombre as 'Etapa',
+        B.NumeroBloque as 'Bloque',
+        L.Numero as 'Número de Lote',
+        L.Area as 'Área (v²)',
+        L.Catastro as 'Catastro',
+        L.Matricula as 'Matrícula',
+        L.Colindancias as 'Colindancias',
+        case when L.Esquina = 1 then 'Sí' else 'No' end as 'Esquina',
+        case when L.Parque = 1 then 'Sí' else 'No' end as 'Parque',
+        case when L.CalleCerrada = 1 then 'Sí' else 'No' end as 'Calle Cerrada',
+        L.Estado as 'Estado'
+    from Lote L
+    join Bloque B on L.BloqueID = B.BloqueID
+    join Etapa E on B.EtapaID = E.EtapaID
+    where E.ProyectoID = @ProyectoID
+)
+go

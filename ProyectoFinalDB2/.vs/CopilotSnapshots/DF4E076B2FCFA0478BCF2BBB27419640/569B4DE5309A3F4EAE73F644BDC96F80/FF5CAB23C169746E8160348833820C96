@@ -1,0 +1,90 @@
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+using System.Configuration;
+
+namespace ProyectoFinalDB2
+{
+    public class FormCrearProyecto : Form
+    {
+        private TextBox txtNombre, txtDepto, txtMuni;
+        private NumericUpDown numPlazo;
+
+        public FormCrearProyecto()
+        {
+            this.Text = "Nuevo Proyecto Inmobiliario";
+            this.Size = new Size(400, 480);
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.BackColor = Color.White;
+            ConfigurarComponentes();
+        }
+
+        private void ConfigurarComponentes()
+        {
+            int x = 40, y = 30, w = 300;
+
+            this.Controls.Add(new Label { Text = "Nombre del Proyecto", Location = new Point(x, y), AutoSize = true });
+            txtNombre = new TextBox { Location = new Point(x, y + 20), Width = w };
+
+            y += 70;
+            this.Controls.Add(new Label { Text = "Departamento", Location = new Point(x, y), AutoSize = true });
+            txtDepto = new TextBox { Location = new Point(x, y + 20), Width = w };
+
+            y += 70;
+            this.Controls.Add(new Label { Text = "Municipio", Location = new Point(x, y), AutoSize = true });
+            txtMuni = new TextBox { Location = new Point(x, y + 20), Width = w };
+
+            y += 70;
+            this.Controls.Add(new Label { Text = "Plazo Máximo (Meses)", Location = new Point(x, y), AutoSize = true });
+            numPlazo = new NumericUpDown { Location = new Point(x, y + 20), Width = w, Minimum = 1, Maximum = 480, Value = 120 };
+
+            y += 80;
+            Button btnGuardar = new Button
+            {
+                Text = "REGISTRAR PROYECTO",
+                Location = new Point(x, y),
+                Size = new Size(w, 45),
+                BackColor = Color.FromArgb(0, 184, 148),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold)
+            };
+            btnGuardar.Click += GuardarProyecto;
+            this.Controls.Add(btnGuardar);
+        }
+
+        private void GuardarProyecto(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtNombre.Text))
+            {
+                MessageBox.Show("El nombre del proyecto es obligatorio.");
+                return;
+            }
+
+            try
+            {
+                string cs = ConfigurationManager.ConnectionStrings["ConexionInversiones"].ConnectionString;
+                using (SqlConnection conn = new SqlConnection(cs))
+                {
+                    string sql = "INSERT INTO Proyecto (Nombre, Departamento, Municipio, PlazoMaximo) VALUES (@n, @d, @m, @p)";
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("@n", txtNombre.Text);
+                    cmd.Parameters.AddWithValue("@d", txtDepto.Text);
+                    cmd.Parameters.AddWithValue("@m", txtMuni.Text);
+                    cmd.Parameters.AddWithValue("@p", (int)numPlazo.Value);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Proyecto guardado exitosamente.");
+                    this.DialogResult = DialogResult.OK;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al guardar: " + ex.Message);
+            }
+        }
+    }
+}

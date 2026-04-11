@@ -104,6 +104,8 @@
       <DependentUpon>Venta.cs</DependentUpon>
     </Compile>
     <Compile Include="PanelPrincipal.cs" />
+    <Compile Include="SeccionProyectos.cs" />
+    <Compile Include="FormCrearProyecto.cs" />
     <Compile Include="SeccionEmpleados.cs" />
     <Compile Include="FormEmpleado.cs" />
     <Compile Include="FormEmpleadoRendimiento.cs" />
