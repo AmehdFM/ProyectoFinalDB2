@@ -56,12 +56,7 @@ namespace ProyectoFinalDB2
             var lblTitulo = new Label { Text = "Plan de Pagos y Estructura de Financiación", Font = new Font("Segoe UI", 14, FontStyle.Bold), ForeColor = CTexto, Location = new Point(26, 20), AutoSize = true };
             header.Controls.Add(lblTitulo);
 
-            var btnEliminar = new Button { Text = "🗑️  Cancelar Venta", Size = new Size(160, 36), BackColor = CNegativo, ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI", 9, FontStyle.Bold), Cursor = Cursors.Hand };
-            btnEliminar.FlatAppearance.BorderSize = 0;
-            btnEliminar.Location = new Point(header.Width - 190, 16);
-            btnEliminar.Anchor = AnchorStyles.Right | AnchorStyles.Top;
-            btnEliminar.Click += BtnEliminar_Click;
-            header.Controls.Add(btnEliminar);
+
 
             var pnlContainer = new Panel { Dock = DockStyle.Fill, Padding = new Padding(24, 20, 24, 24) };
             
@@ -135,29 +130,6 @@ namespace ProyectoFinalDB2
             return y + lblV.Height + 40;
         }
 
-        private void BtnEliminar_Click(object sender, EventArgs e)
-        {
-            var res = MessageBox.Show("¿Está seguro que desea cancelar y eliminar esta venta de manera permanente?\n\nLos triggers devolverán el lote a 'Disponible' y borrarán el plan de pagos.\n¡Esta acción es irreversible!", "Eliminar Venta", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (res == DialogResult.Yes)
-            {
-                try
-                {
-                    using (var conn = new SqlConnection(connStr))
-                    using (var cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = "BEGIN TRANSACTION; DELETE FROM Factura WHERE PagoID IN (SELECT PagoID FROM Pago WHERE VentaID = @v); DELETE FROM Pago WHERE VentaID = @v; DELETE FROM Venta WHERE VentaID = @v; COMMIT TRANSACTION;";
-                        cmd.Parameters.AddWithValue("@v", ventaId);
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                    }
-                    MessageBox.Show("Venta cancelada exitosamente. El inmueble fue liberado.", "Venta Eliminada", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    this.DialogResult = DialogResult.OK;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("No se pudo eliminar la venta por reglas de seguridad en la Base de Datos.\nError: " + ex.Message, "Error de Venta", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
+
     }
 }

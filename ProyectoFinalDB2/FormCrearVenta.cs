@@ -28,7 +28,8 @@ namespace ProyectoFinalDB2
         // ── Col 1: Venta ─────────────────────────────────────────────
         private Label         lblInfoLote, lblValorLote;
         private ComboBox      cmbTipo, cmbEmpleado;
-        private NumericUpDown nudPrima, nudPlazo, nudInteres;
+        private NumericUpDown nudPrima, nudPlazo;
+        private double        interesConfigurado = 0;
         private Panel         pnlCamposCredito;
 
         // ── Col 2: Cliente ───────────────────────────────────────────
@@ -143,14 +144,11 @@ namespace ProyectoFinalDB2
             nudPrima.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top; y += 58;
 
             // Panel campos crédito
-            pnlCamposCredito = new Panel { Location = new Point(x, y), Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top, Height = 130, Visible = false };
+            pnlCamposCredito = new Panel { Location = new Point(x, y), Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top, Height = 70, Visible = false };
             VLbl("Plazo (años) *", pnlCamposCredito, 0, 0);
             nudPlazo = NUD(pnlCamposCredito, 0, 20, 0, 1, 30, 1);
             nudPlazo.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
-            VLbl("Interés Anual (%) *", pnlCamposCredito, 0, 66);
-            nudInteres = NUD(pnlCamposCredito, 0, 88, 2, 0, 100);
-            nudInteres.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
-            card.Controls.Add(pnlCamposCredito); y += 138;
+            card.Controls.Add(pnlCamposCredito); y += 75;
 
             // Empleado
             VLbl("Empleado que realiza la venta *", card, x, y);
@@ -163,7 +161,7 @@ namespace ProyectoFinalDB2
                 if (dw < 60) return;
                 cmbTipo.Width = dw; nudPrima.Width = dw;
                 pnlCamposCredito.Width = dw;
-                nudPlazo.Width = dw; nudInteres.Width = dw;
+                nudPlazo.Width = dw;
                 cmbEmpleado.Width = dw;
             };
 
@@ -316,7 +314,7 @@ namespace ProyectoFinalDB2
                 {
                     cmd.CommandText = @"
                         SELECT L.Numero, B.NumeroBloque, E.Nombre AS Etapa, P.Nombre AS Proyecto,
-                               dbo.fnValorLote(L.LoteID) AS Valor
+                               dbo.fnValorLote(L.LoteID) AS Valor, E.Interes
                         FROM Lote L
                         JOIN Bloque B ON L.BloqueID = B.BloqueID
                         JOIN Etapa E  ON B.EtapaID  = E.EtapaID
@@ -329,7 +327,8 @@ namespace ProyectoFinalDB2
                         if (r.Read())
                         {
                             lblInfoLote.Text  = $"REGISTRAR VENTA  —  Lote #{r["Numero"]}  |  Bloque {r["NumeroBloque"]}  |  Etapa: {r["Etapa"]}  |  Proyecto: {r["Proyecto"]}";
-                            lblValorLote.Text = $"Valor calculado del lote:  L. {Convert.ToDouble(r["Valor"]):N2}";
+                            interesConfigurado = Convert.ToDouble(r["Interes"]);
+                            lblValorLote.Text = $"Valor calculado: L. {Convert.ToDouble(r["Valor"]):N2}  |  Interés Etapa: {interesConfigurado}%";
                         }
                     }
                 }
@@ -370,7 +369,7 @@ namespace ProyectoFinalDB2
         {
             bool esCredito = cmbTipo.SelectedItem?.ToString() == "Credito";
             pnlCamposCredito.Visible = esCredito;
-            if (!esCredito) { nudPlazo.Value = 1; nudInteres.Value = 0; }
+            if (!esCredito) { nudPlazo.Value = 1; }
         }
 
         // ══════════════════════════════════════════════════════════════
@@ -389,9 +388,6 @@ namespace ProyectoFinalDB2
 
             string tipo      = cmbTipo.SelectedItem.ToString();
             bool   esCredito = tipo == "Credito";
-
-            if (esCredito && nudInteres.Value <= 0)
-            { MessageBox.Show("Ingrese una tasa de interés mayor a 0 para ventas a crédito.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
 
             var avalItem  = cmbAval.SelectedItem  as CbItem;
             var benefItem = cmbBenef.SelectedItem as CbItem;
@@ -412,7 +408,7 @@ namespace ProyectoFinalDB2
                     cmd.Parameters.Add(new SqlParameter("@Tipo",          SqlDbType.VarChar, 10) { Value = tipo });
                     cmd.Parameters.Add(new SqlParameter("@Prima",         SqlDbType.Float)       { Value = (double)nudPrima.Value });
                     cmd.Parameters.Add(new SqlParameter("@Plazo",         SqlDbType.Int)         { Value = esCredito ? (int)nudPlazo.Value : 1 });
-                    cmd.Parameters.Add(new SqlParameter("@Interes",       SqlDbType.Float)       { Value = esCredito ? (double)nudInteres.Value : 0.0 });
+                    cmd.Parameters.Add(new SqlParameter("@Interes",       SqlDbType.Float)       { Value = esCredito ? interesConfigurado : 0.0 });
                     conn.Open(); cmd.ExecuteNonQuery();
                 }
                 MessageBox.Show("Venta registrada. El plan de pago fue generado automáticamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);

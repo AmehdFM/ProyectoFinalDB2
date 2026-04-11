@@ -1,0 +1,71 @@
+================================================================================
+OBJETOS DE BASE DE DATOS NO UTILIZADOS - INVERSIONES MAYA
+================================================================================
+
+Este documento enumera los objetos (Procedimientos, Funciones y Vistas) que se
+encuentran definidos en los archivos .sql pero que no tienen referencias activas
+en el código C# del proyecto.
+
+--------------------------------------------------------------------------------
+1. PROCEDIMIENTOS ALMACENADOS (Redundantes o Huérfanos)
+--------------------------------------------------------------------------------
+* spRegistrarVenta
+  - Motivo: La aplicación utiliza 'sp_CrearVenta' para el registro de ventas.
+  - Ubicación: Procedimientos manejo transaccional.sql
+
+* spRegistrarPago
+  - Motivo: No se encontró un formulario de pagos implementado en la interfaz actual.
+  - Ubicación: Procedimientos manejo transaccional.sql
+
+* spDepositoCaja / spDepositoBancario
+  - Motivo: No hay interfaz de tesorería para depósitos directos.
+  - Ubicación: Procedimientos manejo transaccional.sql
+
+* sp_AjustePrecioMasa
+  - Motivo: Procedimiento de mantenimiento masivo no invocado desde la UI.
+  - Ubicación: ProAlmaceCursores.sql
+
+* sp_ConsolidadoAutomatico
+  - Motivo: Lógica de servidor no vinculada a la interfaz.
+  - Ubicación: ProAlmaceCursores.sql
+
+* spRegistrarBitacora / spRegistrarAuditoria
+  - Motivo: Aunque existen, el código C# no envía eventos de auditoría explícitos.
+
+--------------------------------------------------------------------------------
+2. FUNCIONES (Orphaned logic)
+--------------------------------------------------------------------------------
+* fnTotalLotesProyecto
+  - Motivo: Los conteos se realizan directamente en las vistas de resumen.
+
+* fnpagosporeliminar
+  - Motivo: Función auxiliar que no se consume en ningún Grid.
+
+* fnLotesDisponibles (Versión Función)
+  - Motivo: Se utiliza la vista 'vLotesDisponibles' en su lugar.
+
+* fnHistorialPagosLote
+  - Motivo: No hay vista de detalle de pagos por lote individual fuera de 'DetalleCliente'.
+
+* fnClientesSaldo
+  - Motivo: Sustituida por la lógica de 'vEstadoCuentaCliente'.
+
+* fn_ObtenerBloquesPorEtapa / fn_ObtenerLotesPorBloque
+  - Motivo: No se detectaron combos dependientes que utilicen estas funciones de tabla.
+
+--------------------------------------------------------------------------------
+3. VISTAS (Huérfanas o Sustituidas)
+--------------------------------------------------------------------------------
+* vIngresosPorEtapa
+  - Motivo: El resumen financiero global utiliza 'vResumenFinancieroProyecto'.
+
+* vGastosPorProyecto (Versión Vista)
+  - Motivo: La sección de gastos utiliza la función 'fnGastosProyecto(@ID)' para filtrado.
+
+--------------------------------------------------------------------------------
+NOTA: Los triggers no se incluyen en esta lista ya que su ejecución es 
+automática por el motor de base de datos y no requieren ser "llamados" 
+explícitamente por el código C#.
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================

@@ -1,0 +1,110 @@
+================================================================================
+GUÍA TÉCNICA DE INTERACCIÓN SQL-C# - INVERSIONES MAYA
+================================================================================
+
+Este documento explica a detalle la relación entre los objetos de Base de Datos y 
+la interfaz de usuario de la aplicación C#. Úselo como referencia para la defensa 
+técnica del proyecto.
+
+--------------------------------------------------------------------------------
+1. PROCEDIMIENTOS ALMACENADOS (Lógica de Negocio y Escritura)
+--------------------------------------------------------------------------------
+
+* sp_CrearVenta
+  - Ubicación C#: FormCrearVenta.cs -> Método 'BtnRegistrar_Click'.
+  - Contexto UI: Se ejecuta al completar el formulario de venta y presionar "Registrar".
+  - Qué hace: Recibe los IDs de lote y cliente, el tipo de venta (Contado/Crédito) 
+    y la prima. Inserta el registro principal y, mediante triggers, actualiza 
+    el inventario y genera las cuotas por cobrar.
+
+* sp_ConsolidarPagosDiariosCaja
+  - Ubicación C#: SeccionCajaConsolidada.cs -> Método 'CargarDatosDesdeBD'.
+  - Contexto UI: Al abrir la sección "Caja Diaria" o presionar "Actualizar".
+  - Qué hace: Utiliza un CURSOR para recorrer todas las cuentas bancarias de la 
+    empresa y sumar los pagos en efectivo recibidos en la fecha actual. Muestra 
+    una tabla con el Banco, Número de Cuenta y Monto Consolidado.
+
+* sp_GenerarReporteMorosidadMasiva
+  - Ubicación C#: SeccionMorosidad.cs -> Método 'BtnProcesar_Click'.
+  - Contexto UI: Botón "Recalcular Mora" en la sección de Morosidad.
+  - Qué hace: Invoca un CURSOR que recorre a todos los clientes para evaluar su 
+    estado de deuda usando funciones escalares. Al finalizar, la App refresca 
+    el Grid mostrando el estado actualizado de quién debe y cuánto debe.
+
+* sp_InsertarEmpleado / sp_ActualizarEmpleado
+  - Ubicación C#: SeccionEmpleados.cs -> 'InsertEmpleado' y 'UpdateEmpleado'.
+  - Contexto UI: Modales de "Nuevo Empleado" y "Editar Empleado".
+  - Qué hace: Modifica la tabla de personal de forma segura, permitiendo que la 
+    nómina se gestione sin escribir SQL manual en el código C#.
+
+* spCrearProyecto / sp_CrearEtapa / sp_CrearLote
+  - Ubicación C#: Formularios de configuración de inventario.
+  - Contexto UI: Módulo de administración para expandir los proyectos.
+
+--------------------------------------------------------------------------------
+2. FUNCIONES DE TABLA Y ESCALARES (Análisis y Detalles)
+--------------------------------------------------------------------------------
+
+* dbo.fnResumenVentasPorEmpleado()
+  - Ubicación C#: SeccionResumenVentas.cs.
+  - Contexto UI: Gráfico y Tabla de "Resumen de Ventas".
+  - Qué muestra: Un ranking de asesores comerciales con su total de ventas 
+    realizadas, diferenciando entre ventas al contado y crédito.
+
+* dbo.fnGastosProyecto(@ID)
+  - Ubicación C#: SeccionGastosProyecto.cs.
+  - Contexto UI: Consulta de Gastos.
+  - Qué muestra: Una lista detallada de cada egreso (compra de materiales, pago 
+    de planillas, etc.) vinculado específicamente a un proyecto seleccionado.
+
+* dbo.fnSaldoPendiente(@ClienteID)
+  - Ubicación C#: SeccionMorosidad.cs y Expediente de Cliente.
+  - Qué muestra: El monto exacto en Lempiras que el cliente tiene vencido a la 
+    fecha, sumando todas sus cuotas en estado 'Pendiente' con fecha pasada.
+
+* dbo.fn_ObtenerEtapasPorProyecto(@ID)
+  - Ubicación C#: FormDetalleProyecto.cs -> Pestaña "General".
+  - Qué muestra: Un resumen de las etapas del proyecto, incluyendo el precio 
+    por vara cuadrada y el porcentaje de área verde configurado.
+
+--------------------------------------------------------------------------------
+3. VISTAS (Reportes Globales y Consultas)
+--------------------------------------------------------------------------------
+
+* vResumenFinancieroProyecto
+  - Ubicación C#: SeccionFinanciero.cs (Pantalla de Inicio Financiero).
+  - Qué muestra: El estado de salud de cada proyecto: Ingresos Totales vs Gastos 
+    Totales = Beneficio Neto. Los beneficios negativos se resaltan en rojo en C#.
+
+* vLotesDisponibles
+  - Ubicación C#: PanelPrincipal.cs -> Grilla de lotes.
+  - Qué muestra: Solo los terrenos que tienen estado 'Disponible'. Incluye el 
+    número de bloque, área y proyecto para que el vendedor pueda ofrecerlos.
+
+* vDetalleVentaCompleto
+  - Ubicación C#: FormDetalleVenta.cs.
+  - Qué muestra: Un expediente completo que junta datos de 6 tablas distintas: 
+    Vendedor, Cliente, Aval, Beneficiario, Lote y Proyecto.
+
+* vEstadoCuentaCliente / vPlanPagoCliente
+  - Ubicación C#: FormDetalleCliente.cs.
+  - Qué muestra: La radiografía completa de la deuda de un cliente: cuánto ha 
+    pagado, cuánto debe, y el calendario futuro de sus próximos cobros.
+
+--------------------------------------------------------------------------------
+4. TRIGGERS (Automatización Invisible)
+--------------------------------------------------------------------------------
+
+* tr_GenerarPlanPago: El motor de crédito. Al insertar una venta en C#, este 
+  disparador calcula automáticamente todas las cuotas (capital + interés) para 
+  los próximos años sin que el usuario tenga que hacer cálculos manuales.
+
+* tr_ActualizarEstadoLote: Al vender un lote desde la App, este trigger lo marca 
+  como 'Vendido' al instante, evitando que otro vendedor pueda ofrecerlo.
+
+* tr_EliminarVentaCascada: Garantiza que si se borra una venta por error, se 
+  limpien automáticamente todos los pagos y planes asociados, manteniendo la 
+  base de datos sin basura.
+================================================================================
+FIN DE LA EXPLICACIÓN TÉCNICA
+================================================================================

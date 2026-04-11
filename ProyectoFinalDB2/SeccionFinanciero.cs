@@ -47,6 +47,27 @@ namespace ProyectoFinalDB2
             pnlTop.Controls.Add(lblBread);
             pnlTop.Controls.Add(lblTitulo);
 
+            // PANEL DE HERRAMIENTAS GLOBALES
+            var pnlTools = new FlowLayoutPanel 
+            { 
+                Dock = DockStyle.Top, 
+                Height = 60, 
+                BackColor = CHeader, 
+                Padding = new Padding(20, 12, 20, 0),
+                FlowDirection = FlowDirection.LeftToRight
+            };
+            pnlTools.Paint += (s, e) => e.Graphics.DrawLine(new Pen(CBorder), 0, 59, pnlTools.Width, 59);
+
+            var btnCaja = ToolBtn("📊 Caja Diaria", Color.FromArgb(16, 185, 129));
+            var btnMoro = ToolBtn("⚠️ Morosidad", Color.FromArgb(245, 158, 11));
+            var btnVtas = ToolBtn("📈 Resumen Ventas", CAccent);
+
+            btnCaja.Click += (s, e) => new SeccionCajaConsolidada().ShowDialog();
+            btnMoro.Click += (s, e) => new SeccionMorosidad().ShowDialog();
+            btnVtas.Click += (s, e) => new SeccionResumenVentas().ShowDialog();
+
+            pnlTools.Controls.AddRange(new Control[] { btnCaja, btnMoro, btnVtas });
+
             dgvFinanzas = new DataGridView
             {
                 Dock = DockStyle.Fill,
@@ -78,7 +99,27 @@ namespace ProyectoFinalDB2
 
             Controls.Add(dgvFinanzas);
             Controls.Add(pnlFooter);
+            Controls.Add(pnlTools);
             Controls.Add(pnlTop);
+        }
+
+        private Button ToolBtn(string text, Color highlight)
+        {
+            var b = new Button 
+            { 
+                Text = text, 
+                Size = new Size(160, 36), 
+                FlatStyle = FlatStyle.Flat, 
+                BackColor = CCard, 
+                ForeColor = CTexto, 
+                Font = new Font("Segoe UI", 8.5f, FontStyle.Bold), 
+                Cursor = Cursors.Hand,
+                Margin = new Padding(0, 0, 12, 0)
+            };
+            b.FlatAppearance.BorderColor = CBorder;
+            b.MouseEnter += (s, e) => { b.BackColor = highlight; b.ForeColor = Color.White; b.FlatAppearance.BorderColor = highlight; };
+            b.MouseLeave += (s, e) => { b.BackColor = CCard; b.ForeColor = CTexto; b.FlatAppearance.BorderColor = CBorder; };
+            return b;
         }
 
         private void DgvFinanzas_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)

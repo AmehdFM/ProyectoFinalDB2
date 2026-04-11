@@ -1,7 +1,7 @@
---1)Registrar Venta con Plan de Pago y ActualizaciÛn de Lote
+--1)Registrar Venta con Plan de Pago y Actualizaci√≥n de Lote
 --Cuando un cliente compra un lote, se deben insertar la venta, 
 --generar el plan de pagos y marcar el lote como vendido. 
---Todo esto debe hacerse en una transacciÛn para asegurar que
+--Todo esto debe hacerse en una transacci√≥n para asegurar que
 --no queden registros inconsistentes si ocurre un error.
 
 CREATE OR ALTER PROCEDURE spRegistrarVenta
@@ -10,7 +10,7 @@ CREATE OR ALTER PROCEDURE spRegistrarVenta
     @Plazo INT, @Interes FLOAT
 AS
 BEGIN
-    -- 1. VALIDACI”N DEL PLAZO M¡XIMO SEG⁄N EL PROYECTO
+    -- 1. VALIDACI√ìN DEL PLAZO M√ÅXIMO SEG√öN EL PROYECTO
     DECLARE @PlazoMaximoPermitido INT
 
     SELECT @PlazoMaximoPermitido = P.PlazoMaximo
@@ -20,7 +20,7 @@ BEGIN
     INNER JOIN Lote L ON B.BloqueID = L.BloqueID
     WHERE L.LoteID = @LoteID
 
-    -- SI EL PLAZO EXCEDE EL LÕMITE, DETENEMOS LA OPERACI”N ANTES DE INICIAR LA TRANSACCI”N
+    -- SI EL PLAZO EXCEDE EL L√çMITE, DETENEMOS LA OPERACI√ìN ANTES DE INICIAR LA TRANSACCI√ìN
     IF @Plazo > @PlazoMaximoPermitido
     BEGIN
         RETURN
@@ -29,11 +29,11 @@ BEGIN
     -- 2. INICIO DEL MANEJO TRANSACCIONAL
     BEGIN TRANSACTION
 
-    -- EL INSERT DISPARAR¡ AUTOM¡TICAMENTE LOS TRIGGERS tr_ActualizarEstadoLote Y tr_GenerarPlanPago
+    -- EL INSERT DISPARAR√Å AUTOM√ÅTICAMENTE LOS TRIGGERS tr_ActualizarEstadoLote Y tr_GenerarPlanPago
     INSERT INTO Venta (LoteID, ClienteID, EmpleadoID, AvalID, BeneficiarioID, Tipo, Prima, Plazo, Interes)
     VALUES (@LoteID, @ClienteID, @EmpleadoID, @AvalID, @BeneficiarioID, @TipoPago, @Prima, @Plazo, @Interes)
 
-    -- 3. VALIDACI”N DE INTEGRIDAD Y ERRORES (TODO O NADA)
+    -- 3. VALIDACI√ìN DE INTEGRIDAD Y ERRORES (TODO O NADA)
     IF @@ERROR <> 0
     BEGIN
         ROLLBACK TRANSACTION
@@ -49,7 +49,7 @@ GO
 --2) Registrar Pago de una Cuota con Factura
 --Cuando se recibe un pago, se debe registrar el pago, actualizar el plan de pago,
 --generar la factura y asociar todo a la cuenta bancaria correspondiente. Se maneja
---transacciÛn para que todo se guarde correctamente o se deshaga en caso de error.
+--transacci√≥n para que todo se guarde correctamente o se deshaga en caso de error.
 create or alter procedure spRegistrarPago
     @VentaID int, @PlanPagoID int, @EmpleadoID int, @CuentaID int,
     @MontoPagado float, @TipoPago varchar(20)
@@ -78,9 +78,9 @@ begin
 end
 go
 
---3)Registrar DepÛsito en Caja para la Cuenta de un Proyecto
---Al final del dÌa, el cajero deposita los pagos recibidos en la cuenta bancaria
---de la etapa correspondiente. Todo debe hacerse de forma transaccional para no perder informaciÛn de los depÛsitos.
+--3)Registrar Dep√≥sito en Caja para la Cuenta de un Proyecto
+--Al final del d√≠a, el cajero deposita los pagos recibidos en la cuenta bancaria
+--de la etapa correspondiente. Todo debe hacerse de forma transaccional para no perder informaci√≥n de los dep√≥sitos.
 
 create or alter procedure dbo.spDepositoCaja
     @EmpleadoID int,
@@ -91,17 +91,17 @@ as
 begin
 
 
-    -- iniciamos la transacciÛn explÌcita
+    -- iniciamos la transacci√≥n expl√≠cita
     begin transaction
 
-    -- insertamos el registro del depÛsito en la tabla correspondiente
+    -- insertamos el registro del dep√≥sito en la tabla correspondiente
     insert into DepositoCaja (EmpleadoID, CuentaID, MontoTotal, NumeroReferencia)
     values (@EmpleadoID, @CuentaID, @MontoTotal, @NumeroReferencia)
 
-    -- validamos si ocurriÛ alg˙n error durante la inserciÛn
+    -- validamos si ocurri√≥ alg√∫n error durante la inserci√≥n
     if @@error <> 0
     begin
-        -- si hay error, deshacemos la operaciÛn para no perder trazabilidad
+        -- si hay error, deshacemos la operaci√≥n para no perder trazabilidad
         rollback transaction
     end
     else
@@ -127,13 +127,13 @@ BEGIN
     -- Validaciones
     IF LTRIM(RTRIM(@Nombre)) = ''
     BEGIN
-        RAISERROR('El nombre del proyecto no puede estar vacÌo.', 16, 1);
+        RAISERROR('El nombre del proyecto no puede estar vac√≠o.', 16, 1);
         RETURN;
     END
 
     IF @PlazoMaximo <= 0
     BEGIN
-        RAISERROR('El plazo m·ximo debe ser mayor a 0.', 16, 1);
+        RAISERROR('El plazo m√°ximo debe ser mayor a 0.', 16, 1);
         RETURN;
     END
 
@@ -143,7 +143,7 @@ BEGIN
         RETURN;
     END
 
-    -- InserciÛn
+    -- Inserci√≥n
     INSERT INTO Proyecto (Nombre, Departamento, Municipio, PlazoMaximo)
     VALUES (@Nombre, @Departamento, @Municipio, @PlazoMaximo);
 
@@ -182,13 +182,13 @@ begin
 
     if @Interes < 0
     begin
-        raiserror('El interÈs no puede ser negativo.', 16, 1);
+        raiserror('El inter√©s no puede ser negativo.', 16, 1);
         return;
     end
 
     if @AreaVerde < 0 or @AreaVerde > 1
     begin
-        raiserror('El ·rea verde debe estar entre 0 y 1.', 16, 1);
+        raiserror('El √°rea verde debe estar entre 0 y 1.', 16, 1);
         return;
     end
 
@@ -214,7 +214,7 @@ begin
 
     if exists (select 1 from Bloque where EtapaID = @EtapaID and NumeroBloque = @NumeroBloque)
     begin
-        raiserror('Ya existe un bloque con ese n˙mero en la etapa especificada.', 16, 1);
+        raiserror('Ya existe un bloque con ese n√∫mero en la etapa especificada.', 16, 1);
         return;
     end
 
@@ -247,13 +247,13 @@ begin
 
     if @Area <= 0
     begin
-        raiserror('El ·rea debe ser mayor a 0.', 16, 1);
+        raiserror('El √°rea debe ser mayor a 0.', 16, 1);
         return;
     end
 
     if exists (select 1 from Lote where BloqueID = @BloqueID and Numero = @Numero)
     begin
-        raiserror('Ya existe un lote con ese n˙mero en el bloque especificado.', 16, 1);
+        raiserror('Ya existe un lote con ese n√∫mero en el bloque especificado.', 16, 1);
         return;
     end
 
@@ -280,7 +280,7 @@ begin
 
     if not exists (select 1 from Lote where LoteID = @LoteID and Estado = 'Disponible')
     begin
-        raiserror('El lote no existe o no est· disponible.', 16, 1);
+        raiserror('El lote no existe o no est√° disponible.', 16, 1);
         return;
     end
 
@@ -316,7 +316,7 @@ begin
 
     if @Interes < 0
     begin
-        raiserror('El interÈs no puede ser negativo.', 16, 1);
+        raiserror('El inter√©s no puede ser negativo.', 16, 1);
         return;
     end
 
@@ -393,5 +393,44 @@ BEGIN
     INSERT INTO Beneficiario (Nombre, DNI, Telefono, Parentesco)
     VALUES (@Nombre, @DNI, @Telefono, @Parentesco);
     SELECT SCOPE_IDENTITY() AS BeneficiarioID;
+END
+GO
+
+-- =========================================================
+-- CRUD PARA EMPLEADOS (Requerido por R√∫brica)
+-- =========================================================
+
+CREATE OR ALTER PROCEDURE sp_InsertarEmpleado
+    @Nombre VARCHAR(100),
+    @Cargo  VARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO Empleado (Nombre, Cargo)
+    VALUES (@Nombre, @Cargo);
+    SELECT SCOPE_IDENTITY() AS EmpleadoID;
+END
+GO
+
+CREATE OR ALTER PROCEDURE sp_ActualizarEmpleado
+    @EmpleadoID INT,
+    @Nombre     VARCHAR(100),
+    @Cargo      VARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE Empleado 
+    SET Nombre = @Nombre, Cargo = @Cargo 
+    WHERE EmpleadoID = @EmpleadoID;
+END
+GO
+
+CREATE OR ALTER PROCEDURE sp_EliminarEmpleado
+    @EmpleadoID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    -- Nota: Podr√≠a fallar si tiene ventas asociadas (integridad referencial)
+    DELETE FROM Empleado WHERE EmpleadoID = @EmpleadoID;
 END
 GO

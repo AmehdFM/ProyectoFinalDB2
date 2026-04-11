@@ -11,7 +11,6 @@ return @totalLotes
 end
 go
 
--- FunciÃ³n escalar que calcula el valor total de un lote segÃºn su Ã¡rea y precio por vara
 create or alter function dbo.fnValorLote(@loteid int)
 returns float
 as

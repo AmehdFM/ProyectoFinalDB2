@@ -139,7 +139,16 @@
     <Compile Include="FormEmpleadoRendimiento.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SeccionGastosProyecto .cs">
+    <Compile Include="SeccionGastosProyecto.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SeccionCajaConsolidada.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SeccionMorosidad.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SeccionResumenVentas.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="SeccionFinanciero.cs">
