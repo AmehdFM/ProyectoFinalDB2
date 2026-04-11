@@ -98,12 +98,14 @@ namespace ProyectoFinalDB2
                 }
                 else if (texto == "PROYECTOS")
                 {
-                    SeccionProyectos seccion = new SeccionProyectos();
-                    seccion.ShowDialog();
+                      SeccionProyectos seccion = new SeccionProyectos();
+                      seccion.ShowDialog();
+                    
                 }
                 else
                 {
-                    MessageBox.Show("Abriendo sección de " + texto);
+                    SeccionGastosProyecto seccion = new SeccionGastosProyecto();
+                    seccion.ShowDialog();
                 }
             };
 
@@ -153,6 +155,24 @@ namespace ProyectoFinalDB2
         {
             base.OnFormClosing(e);
             Application.Exit();
+        }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // PanelPrincipal
+            // 
+            this.ClientSize = new System.Drawing.Size(282, 253);
+            this.Name = "PanelPrincipal";
+            this.Load += new System.EventHandler(this.PanelPrincipal_Load);
+            this.ResumeLayout(false);
+
+        }
+
+        private void PanelPrincipal_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
