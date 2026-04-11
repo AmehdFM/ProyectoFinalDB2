@@ -64,19 +64,28 @@ on Venta
 after insert
 as
 begin
+     
     declare @VentaID int, @LoteID int, @Plazo int, @Interes float, @Prima float
     declare @MontoTotal float, @MontoFinanciar float
-
+    declare @tipo varchar(20)
+     
+    
+   
     -- obtenemos los datos de la venta recién insertada
     select 
         @VentaID = VentaID, 
         @LoteID = LoteID, 
         @Plazo = Plazo, 
         @Interes = Interes, 
-        @Prima = Prima 
+        @Prima = Prima, 
+        @tipo = tipo
     from inserted
 
     set @MontoTotal = dbo.fnValorLote(@LoteID)
+
+    if (@tipo = 'credito')
+    BEGIN
+    
     set @MontoFinanciar = @MontoTotal - @Prima
 
 
@@ -90,6 +99,12 @@ begin
         Interes, 
         'Pendiente'
     from dbo.f_GenerarCuotas(@MontoFinanciar, @Interes, @Plazo)
+    end
+    else
+    begin
+        insert into PlanPago (VentaID, CuotaNumero, FechaVencimiento, Monto, Capital, Interes, Estado)
+        values(@VentaID, 0, NULL, @MontoFinanciar, @MontoFinanciar, 0, 'pendiente')
+    end
 end
 go
 

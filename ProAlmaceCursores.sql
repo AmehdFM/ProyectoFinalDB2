@@ -28,11 +28,6 @@ BEGIN
         BEGIN
             -- Obtenemos el monto total adeudado mediante la función de saldo [3]
             SET @SaldoPendiente = dbo.fnSaldoPendiente(@ClienteID)
-
-            -- Generamos el reporte individual en la consola de mensajes
-            PRINT 'AVISO DE COBRO - Cliente: ' + @Nombre + 
-                  ' (ID: ' + CAST(@ClienteID AS VARCHAR) + ') ' +
-                  'Deuda Pendiente: L. ' + CAST(@SaldoPendiente AS VARCHAR)
         END
 
         -- Avanzamos a la siguiente fila del cursor
@@ -79,16 +74,9 @@ BEGIN
     -- CICLO DE PROCESAMIENTO MIENTRAS EXISTAN REGISTROS
     WHILE @@FETCH_STATUS = 0
     BEGIN
-        -- CALCULAMOS EL NUEVO VALOR APLICANDO EL INCREMENTO A LA VARA CUADRADA
-        -- SE INCLUYE EL 10% ADICIONAL POR SER DE ESQUINA SEGÚN LA LÓGICA FINANCIERA
+
         SET @NuevoValorProyectado = (@Area * (@PrecioVaraActual + @IncrementoVara)) * 1.10
 
-        -- GENERAMOS EL REPORTE DE REVALUACIÓN PROYECTADA
-        PRINT 'ANÁLISIS DE PLUSVALÍA - Lote ID: ' + CAST(@LoteID AS VARCHAR) + 
-              ' | Área: ' + CAST(@Area AS VARCHAR) + ' v2' +
-              ' | Nuevo Valor Estimado: L. ' + CAST(@NuevoValorProyectado AS VARCHAR)
-
-        -- AVANZAMOS A LA SIGUIENTE FILA DEL CURSOR
         FETCH NEXT FROM cr_LotesReval INTO @LoteID, @Area, @PrecioVaraActual
     END
 
@@ -102,7 +90,6 @@ GO
 CREATE OR ALTER PROCEDURE sp_ConsolidarPagosDiariosCaja
 AS
 BEGIN
-    SET NOCOUNT ON
 
     -- 1. DECLARAMOS UNA VARIABLE TIPO TABLA PARA ALMACENAR LOS RESULTADOS
     -- ESTO PERMITE QUE EL RESULTADO FINAL SE VEA COMO UNA TABLA FÍSICA [3, 6]
