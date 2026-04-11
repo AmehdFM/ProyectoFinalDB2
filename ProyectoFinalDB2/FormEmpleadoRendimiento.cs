@@ -11,97 +11,136 @@ namespace ProyectoFinalDB2
     {
         private int empleadoId;
         private string empleadoNombre;
-        private DataGridView dgvVentas;
+        private DataGridView dgvResumen;
+
+        // Colores para el diseño
+        private static readonly Color ColorFondo = Color.FromArgb(245, 246, 250);
+        private static readonly Color ColorPrimario = Color.FromArgb(26, 26, 46);
+        private static readonly Color ColorAccent = Color.FromArgb(52, 152, 219);
 
         public FormEmpleadoRendimiento(int id, string nombre)
         {
             this.empleadoId = id;
             this.empleadoNombre = nombre;
-            this.Text = "Rendimiento - " + nombre;
-            this.Size = new Size(800, 600);
-            this.StartPosition = FormStartPosition.CenterParent;
+            ConfigurarVentana();
             ConfigurarVista();
-            CargarVentas();
+            CargarDatosDesdeVista();
+        }
+
+        private void ConfigurarVentana()
+        {
+            this.Text = "Análisis de Rendimiento — " + empleadoNombre;
+            this.Size = new Size(850, 450);
+            this.BackColor = ColorFondo;
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.Font = new Font("Segoe UI", 9);
         }
 
         private void ConfigurarVista()
         {
-            Label lbl = new Label
+            // --- HEADER ---
+            Panel pnlHeader = new Panel
             {
-                Text = "Empleado: " + empleadoNombre + " (ID: " + empleadoId + ")",
-                Location = new Point(20, 20),
+                Dock = DockStyle.Top,
+                Height = 80,
+                BackColor = Color.White,
+                Padding = new Padding(20)
+            };
+
+            Label lblTitulo = new Label
+            {
+                Text = "ESTADÍSTICAS DE VENTA",
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = ColorPrimario,
                 AutoSize = true,
-                Font = new Font("Segoe UI", 12, FontStyle.Bold)
+                Location = new Point(25, 15)
             };
 
-            dgvVentas = new DataGridView
+            Label lblSub = new Label
             {
-                Location = new Point(20, 60),
-                Size = new Size(740, 460),
+                Text = $"Reporte detallado para: {empleadoNombre} (ID: {empleadoId})",
+                Font = new Font("Segoe UI", 9),
+                ForeColor = Color.Gray,
+                AutoSize = true,
+                Location = new Point(27, 45)
+            };
+            pnlHeader.Controls.AddRange(new Control[] { lblTitulo, lblSub });
+
+            // --- GRID DE RENDIMIENTO ---
+            dgvResumen = new DataGridView
+            {
+                Location = new Point(25, 100),
+                Size = new Size(785, 250),
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.None,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                AllowUserToAddRows = false,
                 ReadOnly = true,
+                RowHeadersVisible = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                AllowUserToAddRows = false
+                EnableHeadersVisualStyles = false,
+                RowTemplate = { Height = 45 }
             };
 
-            this.Controls.Add(lbl);
-            this.Controls.Add(dgvVentas);
+            dgvResumen.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+            {
+                BackColor = ColorPrimario,
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Alignment = DataGridViewContentAlignment.MiddleCenter
+            };
+
+            this.Controls.Add(dgvResumen);
+            this.Controls.Add(pnlHeader);
         }
 
-        private void CargarVentas()
+        private void CargarDatosDesdeVista()
         {
-            dgvVentas.Columns.Clear();
-            dgvVentas.Rows.Clear();
-
             try
             {
                 string connStr = ConfigurationManager.ConnectionStrings["ConexionInversiones"]?.ConnectionString;
-                if (string.IsNullOrEmpty(connStr))
-                {
-                    MessageBox.Show("No se encontró la cadena de conexión. Mostrando datos de ejemplo.");
-                    CargarVentasEjemplo();
-                    return;
-                }
-
                 using (SqlConnection conn = new SqlConnection(connStr))
-                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    // Intentar tabla Venta
-                    cmd.CommandText = "SELECT VentaID, Fecha, Monto FROM Venta WHERE EmpleadoID = @id";
-                    cmd.Parameters.AddWithValue("@id", empleadoId);
-                    conn.Open();
+                    // Consumimos la vista filtrando por el ID del empleado
+                    string query = "SELECT TotalVentas, VentasContado, VentasCredito, PrimeraVenta, UltimaVenta " +
+                                 "FROM vVentasPorEmpleado WHERE EmpleadoID = @id";
 
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                    da.SelectCommand.Parameters.AddWithValue("@id", empleadoId);
+
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    if (dt.Rows.Count > 0)
                     {
-                        dgvVentas.Columns.Add("VentaID", "VentaID");
-                        dgvVentas.Columns.Add("Fecha", "Fecha");
-                        dgvVentas.Columns.Add("Monto", "Monto");
-
-                        while (reader.Read())
-                        {
-                            var vid = reader["VentaID"]?.ToString() ?? string.Empty;
-                            var fecha = reader["Fecha"]?.ToString() ?? string.Empty;
-                            var monto = reader["Monto"]?.ToString() ?? string.Empty;
-                            dgvVentas.Rows.Add(vid, fecha, monto);
-                        }
+                        dgvResumen.DataSource = dt;
+                        FormatearColumnas();
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se encontraron registros de ventas para este empleado.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error cargando ventas: " + ex.Message + "\nMostrando datos de ejemplo.");
-                CargarVentasEjemplo();
+                MessageBox.Show("Error al cargar la vista: " + ex.Message);
             }
         }
 
-        private void CargarVentasEjemplo()
+        private void FormatearColumnas()
         {
-            dgvVentas.Columns.Add("VentaID", "VentaID");
-            dgvVentas.Columns.Add("Fecha", "Fecha");
-            dgvVentas.Columns.Add("Monto", "Monto");
+            if (dgvResumen.Columns.Contains("TotalVentas")) dgvResumen.Columns["TotalVentas"].HeaderText = "TOTAL VENTAS";
+            if (dgvResumen.Columns.Contains("VentasContado")) dgvResumen.Columns["VentasContado"].HeaderText = "CONTADO";
+            if (dgvResumen.Columns.Contains("VentasCredito")) dgvResumen.Columns["VentasCredito"].HeaderText = "CRÉDITO";
+            if (dgvResumen.Columns.Contains("PrimeraVenta")) dgvResumen.Columns["PrimeraVenta"].HeaderText = "PRIMERA OP.";
+            if (dgvResumen.Columns.Contains("UltimaVenta")) dgvResumen.Columns["UltimaVenta"].HeaderText = "ÚLTIMA OP.";
 
-            dgvVentas.Rows.Add("1001", DateTime.Now.ToShortDateString(), "1500.00");
-            dgvVentas.Rows.Add("1002", DateTime.Now.AddDays(-7).ToShortDateString(), "820.50");
+            // Alinear al centro
+            foreach (DataGridViewColumn col in dgvResumen.Columns)
+            {
+                col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            }
         }
     }
 }

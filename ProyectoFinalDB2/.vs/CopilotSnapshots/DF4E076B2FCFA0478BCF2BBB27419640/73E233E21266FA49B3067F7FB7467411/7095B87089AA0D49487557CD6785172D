@@ -30,12 +30,13 @@ namespace ProyectoFinalDB2
         private void ConfigurarVista()
         {
             this.Text = "Gestión de Empleados — Inversiones Maya";
-            this.Size = new Size(800, 600); // Un poco más ancho para las nuevas columnas
-            this.MinimumSize = new Size(700, 450);
+            this.Size = new Size(700, 560);
+            this.MinimumSize = new Size(600, 400);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = ColorFondo;
             this.Font = new Font("Segoe UI", 9);
 
+            // Breadcrumb
             Label lblBreadcrumb = new Label
             {
                 Text = "Inversiones Maya  ›  Recursos Humanos",
@@ -45,6 +46,7 @@ namespace ProyectoFinalDB2
                 AutoSize = true
             };
 
+            // Título
             Label lblTitulo = new Label
             {
                 Text = "Nómina de empleados",
@@ -54,19 +56,22 @@ namespace ProyectoFinalDB2
                 AutoSize = true
             };
 
+            // Botón Agregar
             Button btnAgregar = new Button
             {
                 Text = "+  Agregar empleado",
-                Size = new Size(170, 34),
+                Location = new Point(500, 40),
+                Size = new Size(162, 34),
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Font = new Font("Segoe UI", 9),
                 BackColor = ColorPrimario,
                 ForeColor = Color.White,
                 Cursor = Cursors.Hand
             };
             btnAgregar.FlatAppearance.BorderSize = 0;
-            btnAgregar.Location = new Point(this.ClientSize.Width - btnAgregar.Width - 28, 40);
-            btnAgregar.Click += (s, e) => {
+            btnAgregar.FlatAppearance.MouseOverBackColor = Color.FromArgb(40, 40, 70);
+            btnAgregar.Click += (s, e) =>
+            {
                 var frm = new FormEmpleado("Nuevo Empleado");
                 if (frm.ShowDialog() == DialogResult.OK)
                 {
@@ -75,18 +80,19 @@ namespace ProyectoFinalDB2
                 }
             };
 
+            // Separador encabezado
             Panel pnlLinea = new Panel
             {
                 Location = new Point(0, 88),
-                Size = new Size(this.Width, 1),
-                BackColor = ColorBorde,
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+                Size = new Size(700, 1),
+                BackColor = ColorBorde
             };
 
+            // DataGridView
             dgvEmpleados = new DataGridView
             {
                 Location = new Point(0, 89),
-                Size = new Size(784, 430),
+                Size = new Size(684, 420),
                 BackgroundColor = ColorTarjeta,
                 BorderStyle = BorderStyle.None,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
@@ -97,17 +103,18 @@ namespace ProyectoFinalDB2
                 GridColor = ColorBorde,
                 CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal,
                 ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None,
-                RowTemplate = { Height = 48 },
-                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right
+                Font = new Font("Segoe UI", 9),
+                RowTemplate = { Height = 44 }
             };
 
             dgvEmpleados.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
             {
                 BackColor = ColorHeader,
                 ForeColor = ColorTextoMuted,
-                Font = new Font("Segoe UI", 8, FontStyle.Bold),
+                Font = new Font("Segoe UI", 8),
                 Padding = new Padding(12, 0, 0, 0),
-                SelectionBackColor = ColorHeader
+                SelectionBackColor = ColorHeader,
+                SelectionForeColor = ColorTextoMuted
             };
 
             dgvEmpleados.DefaultCellStyle = new DataGridViewCellStyle
@@ -121,21 +128,28 @@ namespace ProyectoFinalDB2
 
             dgvEmpleados.CellContentClick += DgvEmpleados_CellContentClick;
 
+            // Footer
             Panel pnlFooter = new Panel
             {
-                Dock = DockStyle.Bottom,
-                Height = 40,
+                Location = new Point(0, 510),
+                Size = new Size(684, 32),
                 BackColor = ColorHeader
             };
-
+            Panel pnlLineaFoot = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 1,
+                BackColor = ColorBorde
+            };
             lblConteo = new Label
             {
-                Text = "Cargando...",
+                Text = "",
                 Font = new Font("Segoe UI", 8),
                 ForeColor = ColorTextoMuted,
-                Location = new Point(20, 12),
+                Location = new Point(20, 9),
                 AutoSize = true
             };
+            pnlFooter.Controls.Add(pnlLineaFoot);
             pnlFooter.Controls.Add(lblConteo);
 
             this.Controls.Add(lblBreadcrumb);
@@ -145,8 +159,13 @@ namespace ProyectoFinalDB2
             this.Controls.Add(dgvEmpleados);
             this.Controls.Add(pnlFooter);
 
-            this.Resize += (s, e) => {
-                btnAgregar.Left = this.ClientSize.Width - btnAgregar.Width - 28;
+            this.Resize += (s, e) =>
+            {
+                int w = this.ClientSize.Width;
+                dgvEmpleados.Width = w;
+                pnlLinea.Width = w;
+                pnlFooter.Width = w;
+                btnAgregar.Left = w - btnAgregar.Width - 28;
             };
         }
 
@@ -158,109 +177,87 @@ namespace ProyectoFinalDB2
             {
                 Name = "Nombre",
                 HeaderText = "EMPLEADO",
-                FillWeight = 120
+                FillWeight = 50
             });
 
             dgvEmpleados.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Cargo",
                 HeaderText = "CARGO",
-                FillWeight = 100,
+                FillWeight = 50,
                 DefaultCellStyle = { ForeColor = ColorTextoMuted }
             });
 
-            // Columna Editar (Más pequeña)
             var colEditar = new DataGridViewButtonColumn
             {
                 Name = "BtnEditar",
                 HeaderText = "",
                 Text = "Editar",
                 UseColumnTextForButtonValue = true,
-                Width = 65, // Botón compacto
-                FlatStyle = FlatStyle.Flat
+                Width = 70,
+                FlatStyle = FlatStyle.Flat,
+                DefaultCellStyle =
+                {
+                    BackColor = ColorTarjeta,
+                    ForeColor = ColorTexto,
+                    SelectionBackColor = ColorSeleccion,
+                    SelectionForeColor = ColorTexto,
+                    Font = new Font("Segoe UI", 8),
+                    Alignment = DataGridViewContentAlignment.MiddleCenter
+                }
             };
-            colEditar.DefaultCellStyle = EstiloBotonGrid(Color.White, ColorTexto);
+
             dgvEmpleados.Columns.Add(colEditar);
-
-            // Columna Rendimiento
-            var colRend = new DataGridViewButtonColumn
-            {
-                Name = "BtnRendimiento",
-                HeaderText = "",
-                Text = "📊 Rendimiento",
-                UseColumnTextForButtonValue = true,
-                Width = 110,
-                FlatStyle = FlatStyle.Flat
-            };
-            colRend.DefaultCellStyle = EstiloBotonGrid(Color.FromArgb(240, 240, 240), ColorPrimario);
-            dgvEmpleados.Columns.Add(colRend);
-        }
-
-        private DataGridViewCellStyle EstiloBotonGrid(Color back, Color fore)
-        {
-            return new DataGridViewCellStyle
-            {
-                BackColor = back,
-                ForeColor = fore,
-                SelectionBackColor = ColorSeleccion,
-                SelectionForeColor = ColorTexto,
-                Font = new Font("Segoe UI", 8, FontStyle.Bold),
-                Alignment = DataGridViewContentAlignment.MiddleCenter
-            };
         }
 
         private void DgvEmpleados_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
+            if (dgvEmpleados.Columns[e.ColumnIndex].Name != "BtnEditar") return;
 
             var row = dgvEmpleados.Rows[e.RowIndex];
+            // El ID se guarda en la Tag de la fila
             if (!(row.Tag is int id)) return;
+
             string nombre = row.Cells["Nombre"].Value?.ToString();
+            string cargo = row.Cells["Cargo"].Value?.ToString();
 
-            // Lógica para BOTÓN EDITAR
-            if (dgvEmpleados.Columns[e.ColumnIndex].Name == "BtnEditar")
+            var frm = new FormEmpleado(id, nombre, cargo);
+            if (frm.ShowDialog() == DialogResult.OK)
             {
-                string cargo = row.Cells["Cargo"].Value?.ToString();
-                var frm = new FormEmpleado(id, nombre, cargo);
-                if (frm.ShowDialog() == DialogResult.OK)
-                {
-                    UpdateEmpleado(id, frm.EmpleadoNombre, frm.EmpleadoCargo);
-                    CargarDatosDesdeBD();
-                }
-            }
-
-            // Lógica para BOTÓN RENDIMIENTO
-            if (dgvEmpleados.Columns[e.ColumnIndex].Name == "BtnRendimiento")
-            {
-                var frmRend = new FormEmpleadoRendimiento(id, nombre);
-                frmRend.ShowDialog();
+                UpdateEmpleado(id, frm.EmpleadoNombre, frm.EmpleadoCargo);
+                CargarDatosDesdeBD();
             }
         }
 
         private void CargarDatosDesdeBD()
         {
             AgregarColumnas();
+
             try
             {
                 string connStr = ConfigurationManager.ConnectionStrings["ConexionInversiones"]?.ConnectionString;
                 if (string.IsNullOrEmpty(connStr)) { CargarDatosEjemplo(); return; }
 
+                using var conn = new SqlConnection(connStr);
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "SELECT EmpleadoID, Nombre, Cargo FROM Empleado ORDER BY Nombre";
+                conn.Open();
+
                 int count = 0;
-                using (SqlConnection conn = new SqlConnection(connStr))
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
                 {
-                    SqlCommand cmd = new SqlCommand("SELECT EmpleadoID, Nombre, Cargo FROM Empleado ORDER BY Nombre", conn);
-                    conn.Open();
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            int idx = dgvEmpleados.Rows.Add(reader["Nombre"], reader["Cargo"]);
-                            dgvEmpleados.Rows[idx].Tag = Convert.ToInt32(reader["EmpleadoID"]);
-                            count++;
-                        }
-                    }
+                    int idx = dgvEmpleados.Rows.Add(
+                        reader["Nombre"]?.ToString(),
+                        reader["Cargo"]?.ToString()
+                    );
+                    // Guardamos el ID en Tag para recuperarlo al editar
+                    dgvEmpleados.Rows[idx].Tag = Convert.ToInt32(reader["EmpleadoID"]);
+                    count++;
                 }
-                lblConteo.Text = $"{count} empleado{(count != 1 ? "s" : "")} en total";
+
+                lblConteo.Text = $"{count} empleado{(count != 1 ? "s" : "")}";
             }
             catch
             {
@@ -274,42 +271,49 @@ namespace ProyectoFinalDB2
             dgvEmpleados.Rows[i1].Tag = 1;
             int i2 = dgvEmpleados.Rows.Add("María López", "Gerente de Ventas");
             dgvEmpleados.Rows[i2].Tag = 2;
-            lblConteo.Text = "Modo de ejemplo (Sin conexión a DB)";
+
+            lblConteo.Text = "2 empleados (ejemplo)";
         }
 
         private void InsertEmpleado(string nombre, string cargo)
         {
-            EjecutarComando("INSERT INTO Empleado (Nombre, Cargo) VALUES (@n, @c)", cmd => {
-                cmd.Parameters.AddWithValue("@n", nombre);
-                cmd.Parameters.AddWithValue("@c", cargo);
-            });
+            EjecutarComando(
+                "INSERT INTO Empleado (Nombre, Cargo) VALUES (@nombre, @cargo)",
+                cmd => {
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@cargo", cargo);
+                }
+            );
         }
 
         private void UpdateEmpleado(int id, string nombre, string cargo)
         {
-            EjecutarComando("UPDATE Empleado SET Nombre=@n, Cargo=@c WHERE EmpleadoID=@id", cmd => {
-                cmd.Parameters.AddWithValue("@n", nombre);
-                cmd.Parameters.AddWithValue("@c", cargo);
-                cmd.Parameters.AddWithValue("@id", id);
-            });
+            EjecutarComando(
+                "UPDATE Empleado SET Nombre=@nombre, Cargo=@cargo WHERE EmpleadoID=@id",
+                cmd => {
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@cargo", cargo);
+                    cmd.Parameters.AddWithValue("@id", id);
+                }
+            );
         }
 
-        private void EjecutarComando(string sql, Action<SqlCommand> p)
+        private void EjecutarComando(string sql, Action<SqlCommand> parametros)
         {
             try
             {
-                string cs = ConfigurationManager.ConnectionStrings["ConexionInversiones"].ConnectionString;
-                using (SqlConnection c = new SqlConnection(cs))
-                {
-                    SqlCommand cmd = new SqlCommand(sql, c);
-                    p(cmd);
-                    c.Open();
-                    cmd.ExecuteNonQuery();
-                }
+                string connStr = ConfigurationManager.ConnectionStrings["ConexionInversiones"]?.ConnectionString;
+                if (string.IsNullOrEmpty(connStr)) throw new Exception("Cadena de conexión no encontrada.");
+                using var conn = new SqlConnection(connStr);
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = sql;
+                parametros(cmd);
+                conn.Open();
+                cmd.ExecuteNonQuery();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
     }

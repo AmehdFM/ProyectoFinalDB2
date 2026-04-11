@@ -16,8 +16,6 @@ namespace ProyectoFinalDB2
             // --- CONFIGURACIÓN DE VENTANA ---
             this.Text = "Inversiones Maya - Dashboard";
             this.Size = new Size(1100, 700);
-            // Abrir en pantalla completa (maximizado)
-            this.WindowState = FormWindowState.Maximized;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(240, 242, 245); // Gris claro moderno
             this.Font = new Font("Segoe UI", 10);
@@ -96,16 +94,9 @@ namespace ProyectoFinalDB2
                     SeccionEmpleados seccion = new SeccionEmpleados();
                     seccion.ShowDialog();
                 }
-                else if (texto == "PROYECTOS")
-                {
-                      SeccionProyectos seccion = new SeccionProyectos();
-                      seccion.ShowDialog();
-                    
-                }
                 else
                 {
-                    SeccionGastosProyecto seccion = new SeccionGastosProyecto();
-                    seccion.ShowDialog();
+                    MessageBox.Show("Abriendo sección de " + texto);
                 }
             };
 
@@ -155,24 +146,6 @@ namespace ProyectoFinalDB2
         {
             base.OnFormClosing(e);
             Application.Exit();
-        }
-
-        private void InitializeComponent()
-        {
-            this.SuspendLayout();
-            // 
-            // PanelPrincipal
-            // 
-            this.ClientSize = new System.Drawing.Size(282, 253);
-            this.Name = "PanelPrincipal";
-            this.Load += new System.EventHandler(this.PanelPrincipal_Load);
-            this.ResumeLayout(false);
-
-        }
-
-        private void PanelPrincipal_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }
