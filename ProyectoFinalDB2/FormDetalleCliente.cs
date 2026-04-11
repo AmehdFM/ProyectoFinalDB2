@@ -106,32 +106,25 @@ namespace ProyectoFinalDB2
             var wrapper = new Panel { Dock = DockStyle.Fill, BackColor = CCard, BorderStyle = BorderStyle.FixedSingle };
             wrapper.Controls.Add(dgv); pnlContenedorPrincipal.Controls.Add(wrapper);
 
-            string sql = "";
-            if (tipo == "Plan") {
-                sql = "SELECT Proyecto, Lote, VentaID, CuotaNumero, FechaVencimiento, Monto, Capital, Interes, Estado FROM vPlanPagoCliente WHERE ClienteID = @id ORDER BY FechaVencimiento";
-            } else if (tipo == "Historial") {
-                sql = "SELECT PagoID AS Recibo, FechaPago, Proyecto, Lote, MontoPagado, CapitalPagado, InteresPagado, MoraPagada FROM vHistorialPagosCliente WHERE ClienteID = @id ORDER BY FechaPago DESC";
-            } else if (tipo == "Facturas") {
-                sql = @"SELECT f.FacturaID as [# Factura], f.FechaEmision as [Fecha Emisión], p.Nombre as Proyecto, l.Numero as Lote, pa.MontoPagado as Monto, e.Nombre as Cajero 
-                        FROM Factura f 
-                        INNER JOIN Pago pa ON f.PagoID = pa.PagoID 
-                        INNER JOIN Venta v ON pa.VentaID = v.VentaID 
-                        INNER JOIN Lote l ON v.LoteID = l.LoteID 
-                        INNER JOIN Bloque b ON l.BloqueID = b.BloqueID 
-                        INNER JOIN Etapa et ON b.EtapaID = et.EtapaID 
-                        INNER JOIN Proyecto p ON et.ProyectoID = p.ProyectoID 
-                        INNER JOIN Empleado e ON pa.EmpleadoID = e.EmpleadoID 
-                        WHERE v.ClienteID = @id 
-                        ORDER BY f.FechaEmision DESC";
-            }
+            string procName = null;
+            if (tipo == "Plan") procName = "sp_GetPlanPagoClienteHome";
+            else if (tipo == "Historial") procName = "sp_GetHistorialPagosClienteHome";
+            else if (tipo == "Facturas") procName = "sp_GetFacturasCliente";
 
             try
             {
                 using (var conn = new SqlConnection(connStr))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = sql; cmd.Parameters.AddWithValue("@id", clienteId);
-                    conn.Open(); var dt = new DataTable(); dt.Load(cmd.ExecuteReader()); dgv.DataSource = dt;
+                    if (string.IsNullOrEmpty(procName)) throw new InvalidOperationException("Procedimiento no definido para el tipo solicitado.");
+                    cmd.CommandText = procName;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ClienteID", clienteId);
+
+                    conn.Open();
+                    var dt = new DataTable();
+                    dt.Load(cmd.ExecuteReader());
+                    dgv.DataSource = dt;
 
                     // Colorear montos y estados
                     dgv.CellFormatting += (s, e) => {
@@ -204,27 +197,23 @@ namespace ProyectoFinalDB2
                 using (var conn = new SqlConnection(connStr))
                 {
                     conn.Open();
-                    using (var cmd = new SqlCommand("SELECT EmpleadoID, Nombre FROM Empleado", conn))
-                    using (var dr = cmd.ExecuteReader()) {
-                        var dtEmp = new DataTable(); dtEmp.Load(dr);
-                        cboCajero.DataSource = dtEmp; cboCajero.DisplayMember = "Nombre"; cboCajero.ValueMember = "EmpleadoID";
+                    using (var cmd = new SqlCommand("sp_GetListaEmpleados", conn)) {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var dr = cmd.ExecuteReader()) {
+                            var dtEmp = new DataTable(); dtEmp.Load(dr);
+                            cboCajero.DataSource = dtEmp; cboCajero.DisplayMember = "Nombre"; cboCajero.ValueMember = "EmpleadoID";
+                        }
                     }
-                    using (var cmd = new SqlCommand("SELECT CuentaID, Banco + ' - ' + NumeroCuenta AS Detalle FROM Cuenta", conn))
-                    using (var dr = cmd.ExecuteReader()) {
-                        var dtCta = new DataTable(); dtCta.Load(dr);
-                        cboCuenta.DataSource = dtCta; cboCuenta.DisplayMember = "Detalle"; cboCuenta.ValueMember = "CuentaID";
+                    using (var cmd = new SqlCommand("sp_GetCuentasCombo", conn)) {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var dr = cmd.ExecuteReader()) {
+                            var dtCta = new DataTable(); dtCta.Load(dr);
+                            cboCuenta.DataSource = dtCta; cboCuenta.DisplayMember = "Detalle"; cboCuenta.ValueMember = "CuentaID";
+                        }
                     }
-                    string sqlCuotas = @"SELECT pp.PlanPagoID, v.VentaID, p.Nombre as Proyecto, l.Numero as Lote, pp.CuotaNumero, pp.FechaVencimiento, pp.Monto
-                                        FROM PlanPago pp
-                                        INNER JOIN Venta v ON pp.VentaID = v.VentaID
-                                        INNER JOIN Lote l ON v.LoteID = l.LoteID
-                                        INNER JOIN Bloque b ON l.BloqueID = b.BloqueID
-                                        INNER JOIN Etapa e ON b.EtapaID = e.EtapaID
-                                        INNER JOIN Proyecto p ON e.ProyectoID = p.ProyectoID
-                                        WHERE v.ClienteID = @id AND pp.Estado = 'Pendiente'
-                                        ORDER BY pp.FechaVencimiento ASC";
-                    using (var cmd = new SqlCommand(sqlCuotas, conn)) {
-                        cmd.Parameters.AddWithValue("@id", clienteId);
+                    using (var cmd = new SqlCommand("sp_GetCuotasPendientesCliente", conn)) {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@ClienteID", clienteId);
                         var dtCuotas = new DataTable(); dtCuotas.Load(cmd.ExecuteReader());
                         dgvCuotas.DataSource = dtCuotas;
                         dgvCuotas.Columns["PlanPagoID"].Visible = false;

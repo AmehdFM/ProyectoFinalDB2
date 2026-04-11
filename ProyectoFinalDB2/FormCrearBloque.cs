@@ -93,8 +93,9 @@ namespace ProyectoFinalDB2
                 using (var conn = new SqlConnection(connStr))
                 using (var cmd  = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT EtapaID, Nombre FROM Etapa WHERE ProyectoID = @pid ORDER BY Nombre";
-                    cmd.Parameters.AddWithValue("@pid", proyectoId);
+                    cmd.CommandText = "sp_GetEtapasPorProyecto";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ProyectoID", proyectoId);
                     conn.Open();
                     using (var r = cmd.ExecuteReader())
                         while (r.Read())
@@ -114,8 +115,9 @@ namespace ProyectoFinalDB2
                 using (var conn = new SqlConnection(connStr))
                 using (var cmd  = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT ISNULL(MAX(NumeroBloque), 0) + 1 FROM Bloque WHERE EtapaID = @eid";
-                    cmd.Parameters.AddWithValue("@eid", eid);
+                    cmd.CommandText = "sp_GetSiguienteNumeroBloque";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@EtapaID", eid);
                     conn.Open();
                     int sug = Convert.ToInt32(cmd.ExecuteScalar());
                     nudNumero.Value = sug;

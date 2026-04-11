@@ -90,7 +90,8 @@ namespace ProyectoFinalDB2
                 using (var conn = new SqlConnection(connStr))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT ClienteID, Nombre, DNI, Telefono FROM Cliente ORDER BY Nombre";
+                    cmd.CommandText = "sp_GetListaClientes";
+                    cmd.CommandType = CommandType.StoredProcedure;
                     conn.Open();
                     using (var r = cmd.ExecuteReader())
                     {

@@ -150,7 +150,8 @@ namespace ProyectoFinalDB2
 
                 int count = 0;
                 using (SqlConnection conn = new SqlConnection(connStr)) {
-                    SqlCommand cmd = new SqlCommand("SELECT EmpleadoID, Nombre, Cargo FROM Empleado ORDER BY Nombre", conn);
+                    SqlCommand cmd = new SqlCommand("sp_GetListaEmpleados", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
                     conn.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader()) {
                         while (reader.Read()) {

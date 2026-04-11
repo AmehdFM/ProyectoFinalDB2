@@ -126,8 +126,9 @@ namespace ProyectoFinalDB2
                 using (var conn = new SqlConnection(connStr))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT IngresoTotal, GastoTotal, BeneficioTotal FROM vResumenFinancieroProyecto WHERE ProyectoID = @p";
-                    cmd.Parameters.AddWithValue("@p", proyectoId);
+                    cmd.CommandText = "sp_GetResumenFinancieroProyecto";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ProyectoID", proyectoId);
                     conn.Open();
                     using (var r = cmd.ExecuteReader())
                     {
@@ -161,21 +162,21 @@ namespace ProyectoFinalDB2
             wrapper.Controls.Add(dgv);
             pnlContenedorPrincipal.Controls.Add(wrapper);
 
-            string sql = "";
-            if (tipo == "Ingresos")
-                sql = "SELECT Etapa, TotalPagos, IngresoTotal, CapitalRecuperado, InteresesRecaudados FROM vIngresosPorEtapa WHERE ProyectoID = @p";
-            else if (tipo == "Gastos")
-                sql = "SELECT Fecha, Concepto, Monto FROM Gastos WHERE ProyectoID = @p ORDER BY Fecha DESC";
-            else if (tipo == "Ventas")
-                sql = "SELECT VentaID, Lote, Cliente, Fecha, Tipo, ValorLote, Prima FROM vHistorialVentasProyecto WHERE ProyectoID = @p ORDER BY Fecha DESC";
+            string procName = null;
+            if (tipo == "Ingresos") procName = "sp_GetIngresosPorEtapa";
+            else if (tipo == "Gastos") procName = "sp_GetGastosPorProyecto";
+            else if (tipo == "Ventas") procName = "sp_GetHistorialVentasProyecto";
 
             try
             {
                 using (var conn = new SqlConnection(connStr))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = sql;
-                    cmd.Parameters.AddWithValue("@p", proyectoId);
+                    if (string.IsNullOrEmpty(procName)) throw new InvalidOperationException("Procedimiento no definido para el tipo solicitado.");
+                    cmd.CommandText = procName;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    // cmd logic handled in the if(tipo) block above
+                    cmd.Parameters.AddWithValue("@ProyectoID", proyectoId);
                     conn.Open();
                     var dt = new DataTable();
                     dt.Load(cmd.ExecuteReader());

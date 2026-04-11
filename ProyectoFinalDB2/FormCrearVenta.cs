@@ -312,15 +312,9 @@ namespace ProyectoFinalDB2
                 using (var conn = new SqlConnection(connStr))
                 using (var cmd  = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"
-                        SELECT L.Numero, B.NumeroBloque, E.Nombre AS Etapa, P.Nombre AS Proyecto,
-                               dbo.fnValorLote(L.LoteID) AS Valor, E.Interes
-                        FROM Lote L
-                        JOIN Bloque B ON L.BloqueID = B.BloqueID
-                        JOIN Etapa E  ON B.EtapaID  = E.EtapaID
-                        JOIN Proyecto P ON E.ProyectoID = P.ProyectoID
-                        WHERE L.LoteID = @id";
-                    cmd.Parameters.AddWithValue("@id", loteId);
+                    cmd.CommandText = "sp_GetLoteDetalleParaVenta";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@LoteID", loteId);
                     conn.Open();
                     using (var r = cmd.ExecuteReader())
                     {
@@ -338,10 +332,10 @@ namespace ProyectoFinalDB2
 
         private void CargarCombos()
         {
-            Combo(cmbCliente,  "SELECT ClienteID, Nombre FROM Cliente ORDER BY Nombre",         "ClienteID", "Nombre", true);
-            Combo(cmbEmpleado, "SELECT EmpleadoID, Nombre FROM Empleado ORDER BY Nombre",       "EmpleadoID","Nombre");
-            Combo(cmbAval,     "SELECT AvalID, Nombre FROM Aval ORDER BY Nombre",               "AvalID",    "Nombre", true);
-            Combo(cmbBenef,    "SELECT BeneficiarioID, Nombre FROM Beneficiario ORDER BY Nombre","BeneficiarioID","Nombre", true);
+            Combo(cmbCliente,  "sp_GetListaClientes",      "ClienteID", "Nombre", true);
+            Combo(cmbEmpleado, "sp_GetListaEmpleados",     "EmpleadoID","Nombre");
+            Combo(cmbAval,     "sp_GetListaAvales",        "AvalID",    "Nombre", true);
+            Combo(cmbBenef,    "sp_GetListaBeneficiarios", "BeneficiarioID","Nombre", true);
             if (cmbTipo.Items.Count > 0) cmbTipo.SelectedIndex = 0;
         }
 
@@ -352,6 +346,7 @@ namespace ProyectoFinalDB2
                 using (var conn = new SqlConnection(connStr))
                 using (var cmd  = new SqlCommand(sql, conn))
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
                     conn.Open();
                     using (var r = cmd.ExecuteReader())
                     {

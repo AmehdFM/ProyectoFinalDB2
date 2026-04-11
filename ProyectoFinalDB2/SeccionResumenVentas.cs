@@ -101,8 +101,8 @@ namespace ProyectoFinalDB2
             {
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
-                    string sql = "SELECT * FROM dbo.fnResumenVentasPorEmpleado()";
-                    SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+                    SqlDataAdapter da = new SqlDataAdapter("sp_GetResumenVentasPorEmpleado", conn);
+                    da.SelectCommand.CommandType = CommandType.StoredProcedure;
                     DataTable dt = new DataTable();
                     da.Fill(dt);
                     dgvResumen.DataSource = dt;

@@ -214,13 +214,8 @@ namespace ProyectoFinalDB2
                 using (var conn = new SqlConnection(connStr))
                 using (var cmd  = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"
-                        SELECT P.ProyectoID, P.Nombre, P.Departamento, P.Municipio, P.PlazoMaximo,
-                               COUNT(E.EtapaID) AS TotalEtapas
-                        FROM Proyecto P
-                        LEFT JOIN Etapa E ON P.ProyectoID = E.ProyectoID
-                        GROUP BY P.ProyectoID, P.Nombre, P.Departamento, P.Municipio, P.PlazoMaximo
-                        ORDER BY P.Nombre";
+                    cmd.CommandText = "sp_GetListaProyectosDetalle";
+                    cmd.CommandType = CommandType.StoredProcedure;
                     conn.Open();
                     using (var r = cmd.ExecuteReader())
                     {

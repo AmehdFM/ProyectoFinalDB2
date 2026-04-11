@@ -102,11 +102,10 @@ namespace ProyectoFinalDB2
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
                     // Consumimos la vista filtrando por el ID del empleado
-                    string query = "SELECT TotalVentas, VentasContado, VentasCredito, PrimeraVenta, UltimaVenta " +
-                                 "FROM vVentasPorEmpleado WHERE EmpleadoID = @id";
-
+                    string query = "sp_GetVentasPorEmpleado";
                     SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                    da.SelectCommand.Parameters.AddWithValue("@id", empleadoId);
+                    da.SelectCommand.CommandType = CommandType.StoredProcedure;
+                    da.SelectCommand.Parameters.AddWithValue("@EmpleadoID", empleadoId);
 
                     DataTable dt = new DataTable();
                     da.Fill(dt);

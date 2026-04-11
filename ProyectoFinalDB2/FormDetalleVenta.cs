@@ -96,8 +96,9 @@ namespace ProyectoFinalDB2
                 using (var conn = new SqlConnection(connStr))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT * FROM vDetalleVentaCompleto WHERE VentaID = @v";
-                    cmd.Parameters.AddWithValue("@v", ventaId);
+                    cmd.CommandText = "sp_GetDetalleVentaCompleto";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@VentaID", ventaId);
                     conn.Open();
                     using (var r = cmd.ExecuteReader())
                     {
@@ -113,7 +114,8 @@ namespace ProyectoFinalDB2
                         }
                     }
 
-                    cmd.CommandText = "SELECT CuotaNumero, FechaVencimiento, Monto, Capital, Interes, Estado FROM PlanPago WHERE VentaID = @v ORDER BY CuotaNumero";
+                    cmd.CommandText = "sp_GetPlanPagoDetalle";
+                    cmd.CommandType = CommandType.StoredProcedure;
                     var dt = new DataTable();
                     dt.Load(cmd.ExecuteReader());
                     dgvPlan.DataSource = dt;

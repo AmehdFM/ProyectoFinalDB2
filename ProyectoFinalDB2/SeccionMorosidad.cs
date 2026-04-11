@@ -144,11 +144,8 @@ namespace ProyectoFinalDB2
 
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
-                    SqlCommand cmd = new SqlCommand(@"
-                        SELECT c.ClienteID, c.Nombre,
-                               dbo.fnSaldoPendiente(c.ClienteID) AS Saldo,
-                               CASE WHEN dbo.fnEsClienteMoroso(c.ClienteID) = 1 THEN 'MOROSO' ELSE 'AL DÍA' END AS Estado
-                        FROM Cliente c ORDER BY Saldo DESC", conn);
+                    SqlCommand cmd = new SqlCommand("sp_GetMorosidadReport", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
 
                     conn.Open();
                     SqlDataReader reader = cmd.ExecuteReader();
