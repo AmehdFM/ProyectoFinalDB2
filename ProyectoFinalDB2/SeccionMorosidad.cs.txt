@@ -1,0 +1,212 @@
+﻿using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Windows.Forms;
+using System.Configuration;
+
+namespace ProyectoFinalDB2
+{
+    public class SeccionMorosidad : Form
+    {
+        private DataGridView dgvMorosos;
+        private Label lblConteo;
+
+        private static readonly Color ColorFondo = Color.FromArgb(247, 247, 245);
+        private static readonly Color ColorTarjeta = Color.White;
+        private static readonly Color ColorBorde = Color.FromArgb(220, 220, 215);
+        private static readonly Color ColorTexto = Color.FromArgb(30, 30, 28);
+        private static readonly Color ColorTextoMuted = Color.FromArgb(130, 128, 120);
+        private static readonly Color ColorPrimario = Color.FromArgb(26, 26, 46);
+        private static readonly Color ColorSeleccion = Color.FromArgb(235, 244, 255);
+        private static readonly Color ColorHeader = Color.FromArgb(250, 250, 248);
+
+        public SeccionMorosidad()
+        {
+            ConfigurarVista();
+            CargarDatosDesdeBD();
+        }
+
+        private void ConfigurarVista()
+        {
+            this.Text = "Reporte de Morosidad — Inversiones Maya";
+            this.Size = new Size(900, 600);
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.BackColor = ColorFondo;
+            this.Font = new Font("Segoe UI", 9);
+
+            Label lblTitulo = new Label
+            {
+                Text = "Reporte de Clientes Morosos",
+                Font = new Font("Segoe UI", 15, FontStyle.Regular),
+                ForeColor = ColorTexto,
+                Location = new Point(28, 42),
+                AutoSize = true
+            };
+
+            
+
+            Panel pnlLinea = new Panel
+            {
+                Location = new Point(0, 88),
+                Size = new Size(this.Width, 1),
+                BackColor = ColorBorde,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+            };
+
+            dgvMorosos = new DataGridView
+            {
+                Location = new Point(0, 89),
+                Size = new Size(900, 430),
+                BackgroundColor = ColorTarjeta,
+                BorderStyle = BorderStyle.None,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                AllowUserToAddRows = false,
+                ReadOnly = true,
+                RowHeadersVisible = false,
+                GridColor = ColorBorde,
+                CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal,
+                ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None,
+                RowTemplate = { Height = 48 },
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right
+            };
+
+            dgvMorosos.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+            {
+                BackColor = ColorHeader,
+                ForeColor = ColorTextoMuted,
+                Font = new Font("Segoe UI", 8, FontStyle.Bold),
+                Padding = new Padding(12, 0, 0, 0)
+            };
+
+            dgvMorosos.DefaultCellStyle = new DataGridViewCellStyle
+            {
+                BackColor = ColorTarjeta,
+                ForeColor = ColorTexto,
+                SelectionBackColor = ColorSeleccion,
+                SelectionForeColor = ColorTexto,
+                Padding = new Padding(12, 0, 0, 0)
+            };
+
+            Panel pnlFooter = new Panel
+            {
+                Dock = DockStyle.Bottom,
+                Height = 40,
+                BackColor = ColorHeader
+            };
+
+            lblConteo = new Label
+            {
+                Text = "Listo",
+                Font = new Font("Segoe UI", 8),
+                ForeColor = ColorTextoMuted,
+                Location = new Point(20, 12),
+                AutoSize = true
+            };
+
+            pnlFooter.Controls.Add(lblConteo);
+
+            this.Controls.Add(lblTitulo);
+            this.Controls.Add(pnlLinea);
+            this.Controls.Add(dgvMorosos);
+            this.Controls.Add(pnlFooter);
+
+            
+        }
+
+        private void AgregarColumnas()
+        {
+            dgvMorosos.Columns.Clear();
+
+            dgvMorosos.Columns.Add("ClienteID", "ID CLIENTE");
+            dgvMorosos.Columns.Add("Nombre", "NOMBRE");
+            dgvMorosos.Columns.Add("Saldo", "SALDO PENDIENTE");
+            dgvMorosos.Columns.Add("Estado", "ESTADO");
+        }
+
+        private void CargarDatosDesdeBD()
+        {
+            AgregarColumnas();
+
+            try
+            {
+                string connStr = ConfigurationManager.ConnectionStrings["ConexionInversiones"]?.ConnectionString;
+
+                if (string.IsNullOrEmpty(connStr))
+                {
+                    CargarEjemplo();
+                    return;
+                }
+
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    SqlCommand cmd = new SqlCommand(@"
+                        SELECT c.ClienteID,
+                               c.Nombre,
+                               dbo.fnSaldoPendiente(c.ClienteID) AS Saldo,
+                               CASE 
+                                    WHEN dbo.fnEsClienteMoroso(c.ClienteID) = 1 THEN 'MOROSO'
+                                    ELSE 'AL DÍA'
+                               END AS Estado
+                        FROM Cliente c", conn);
+
+                    conn.Open();
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    int count = 0;
+
+                    while (reader.Read())
+                    {
+                        dgvMorosos.Rows.Add(
+                            reader["ClienteID"],
+                            reader["Nombre"],
+                            reader["Saldo"],
+                            reader["Estado"]
+                        );
+
+                        count++;
+                    }
+
+                    lblConteo.Text = $"{count} clientes evaluados";
+                }
+            }
+            catch
+            {
+                CargarEjemplo();
+            }
+        }
+
+        private void EjecutarSP()
+        {
+            try
+            {
+                string connStr = ConfigurationManager.ConnectionStrings["ConexionInversiones"].ConnectionString;
+
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    SqlCommand cmd = new SqlCommand("sp_GenerarReporteMorosidadMasiva", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
+                MessageBox.Show("Reporte generado (revisar consola SQL / PRINT)");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
+        private void CargarEjemplo()
+        {
+            dgvMorosos.Rows.Add(1, "Juan Pérez", 15000, "MOROSO");
+            dgvMorosos.Rows.Add(2, "Ana López", 0, "AL DÍA");
+
+            lblConteo.Text = "Modo ejemplo (sin conexión)";
+        }
+    }
+}
