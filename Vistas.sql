@@ -122,21 +122,22 @@ go
 
 create or alter view vIngresosPorEtapa 
 as
-	select 
-		p.Nombre as Proyecto,
-		e.EtapaID,
-		e.Nombre as Etapa,
-		count(distinct pa.PagoID) as TotalPagos,
-		round(sum(pa.MontoPagado), 2) as IngresoTotal,
-		round(sum(pa.CapitalPagado), 2) as CapitalRecuperado,
-		round(sum(pa.InteresPagado), 2) as InteresesRecaudados
-	from Etapa e
-	inner join Proyecto p on e.ProyectoID = p.ProyectoID
-	inner join Bloque b on b.EtapaID = e.EtapaID
-	inner join Lote l on l.BloqueID = b.BloqueID
-	inner join Venta v on v.LoteID = l.LoteID
-	inner join Pago pa on pa.VentaID = v.VentaID
-	group by p.Nombre, e.EtapaID, e.Nombre;
+SELECT 
+    p.ProyectoID,
+    p.Nombre as Proyecto,
+    e.EtapaID,
+    e.Nombre as Etapa,
+    count(distinct pa.PagoID) as TotalPagos,
+    round(sum(ISNULL(v.Prima, 0)) + sum(ISNULL(pa.MontoPagado, 0)), 2) as IngresoTotal,
+    round(sum(ISNULL(v.Prima, 0)) + sum(ISNULL(pa.CapitalPagado, 0)), 2) as CapitalRecuperado,
+    round(sum(ISNULL(pa.InteresPagado, 0)), 2) as InteresesRecaudados
+FROM Etapa e
+INNER JOIN Proyecto p on e.ProyectoID = p.ProyectoID
+INNER JOIN Bloque b on b.EtapaID = e.EtapaID
+INNER JOIN Lote l on l.BloqueID = b.BloqueID
+INNER JOIN Venta v on v.LoteID = l.LoteID
+LEFT JOIN Pago pa on pa.VentaID = v.VentaID
+GROUP BY p.ProyectoID, p.Nombre, e.EtapaID, e.Nombre;
 go
 
 create or alter view vGastosPorProyecto 
@@ -154,3 +155,122 @@ as
 	left join Gastos g on p.ProyectoID = g.ProyectoID
 	group by p.ProyectoID, p.Nombre, p.Departamento, p.Municipio;
 go
+-- =======================================================================
+-- NUEVAS VISTAS FINANCIERAS Y DE CLIENTES (AGREGADAS RECIENTEMENTE)
+-- =======================================================================
+
+create or alter view vResumenFinancieroProyecto 
+as
+SELECT 
+    p.ProyectoID,
+    p.Nombre AS Proyecto,
+    (
+        ISNULL((SELECT SUM(pa.MontoPagado) FROM Pago pa JOIN Venta v ON pa.VentaID = v.VentaID JOIN Lote l ON v.LoteID = l.LoteID JOIN Bloque b ON l.BloqueID = b.BloqueID JOIN Etapa e ON b.EtapaID = e.EtapaID WHERE e.ProyectoID = p.ProyectoID), 0)
+        +
+        ISNULL((SELECT SUM(v.Prima) FROM Venta v JOIN Lote l ON v.LoteID = l.LoteID JOIN Bloque b ON l.BloqueID = b.BloqueID JOIN Etapa e ON b.EtapaID = e.EtapaID WHERE e.ProyectoID = p.ProyectoID), 0)
+    ) AS IngresoTotal,
+    ISNULL((SELECT SUM(g.Monto) FROM Gastos g WHERE g.ProyectoID = p.ProyectoID), 0) AS GastoTotal,
+    (
+        (ISNULL((SELECT SUM(pa.MontoPagado) FROM Pago pa JOIN Venta v ON pa.VentaID = v.VentaID JOIN Lote l ON v.LoteID = l.LoteID JOIN Bloque b ON l.BloqueID = b.BloqueID JOIN Etapa e ON b.EtapaID = e.EtapaID WHERE e.ProyectoID = p.ProyectoID), 0)
+        +
+        ISNULL((SELECT SUM(v.Prima) FROM Venta v JOIN Lote l ON v.LoteID = l.LoteID JOIN Bloque b ON l.BloqueID = b.BloqueID JOIN Etapa e ON b.EtapaID = e.EtapaID WHERE e.ProyectoID = p.ProyectoID), 0))
+        - 
+        ISNULL((SELECT SUM(g.Monto) FROM Gastos g WHERE g.ProyectoID = p.ProyectoID), 0)
+    ) AS BeneficioTotal
+FROM Proyecto p;
+go
+
+create or alter view vHistorialPagosCliente
+as
+SELECT 
+    c.ClienteID,
+    pa.PagoID,
+    pa.FechaPago,
+    pa.MontoPagado,
+    pa.CapitalPagado,
+    pa.InteresPagado,
+    0 AS MoraPagada,
+    p.Nombre AS Proyecto,
+    l.Numero AS Lote
+FROM Pago pa
+JOIN Venta v ON pa.VentaID = v.VentaID
+JOIN Cliente c ON v.ClienteID = c.ClienteID
+JOIN Lote l ON v.LoteID = l.LoteID
+JOIN Bloque b ON l.BloqueID = b.BloqueID
+JOIN Etapa e ON b.EtapaID = e.EtapaID
+JOIN Proyecto p ON e.ProyectoID = p.ProyectoID;
+go
+
+create or alter view vPlanPagoCliente
+as
+SELECT
+    v.ClienteID,
+    v.VentaID,
+    pp.CuotaNumero,
+    pp.FechaVencimiento,
+    pp.Monto,
+    pp.Capital,
+    pp.Interes,
+    pp.Estado,
+    l.Numero AS Lote,
+    p.Nombre AS Proyecto
+FROM PlanPago pp
+JOIN Venta v ON pp.VentaID = v.VentaID
+JOIN Lote l ON v.LoteID = l.LoteID
+JOIN Bloque b ON l.BloqueID = b.BloqueID
+JOIN Etapa e ON b.EtapaID = e.EtapaID
+JOIN Proyecto p ON e.ProyectoID = p.ProyectoID;
+go
+
+create or alter view vHistorialVentasProyecto
+as
+SELECT 
+    v.VentaID,
+    p.ProyectoID,
+    l.Numero AS Lote,
+    b.NumeroBloque AS Bloque,
+    e.Nombre AS Etapa,
+    c.Nombre AS Cliente,
+    v.Fecha,
+    v.Tipo,
+    dbo.fnValorLote(l.LoteID) AS ValorLote,
+    v.Prima
+FROM Venta v
+JOIN Lote l ON v.LoteID = l.LoteID
+JOIN Bloque b ON l.BloqueID = b.BloqueID
+JOIN Etapa e ON b.EtapaID = e.EtapaID
+JOIN Proyecto p ON e.ProyectoID = p.ProyectoID
+JOIN Cliente c ON v.ClienteID = c.ClienteID;
+GO
+
+create or alter view vDetalleVentaCompleto
+as
+SELECT 
+    v.VentaID,
+    v.Fecha,
+    v.Tipo,
+    v.Prima,
+    v.Plazo,
+    v.Interes,
+    c.Nombre AS ClienteNombre,
+    c.DNI AS ClienteDNI,
+    c.Telefono AS ClienteTelefono,
+    av.Nombre AS AvalNombre,
+    bf.Nombre AS BeneficiarioNombre,
+    em.Nombre AS AsesorNombre,
+    l.Numero AS LoteNumero,
+    l.Area AS LoteArea,
+    b.NumeroBloque,
+    e.Nombre AS Etapa,
+    p.Nombre AS Proyecto
+FROM Venta v
+JOIN Lote l ON v.LoteID = l.LoteID
+JOIN Bloque b ON l.BloqueID = b.BloqueID
+JOIN Etapa e ON b.EtapaID = e.EtapaID
+JOIN Proyecto p ON e.ProyectoID = p.ProyectoID
+JOIN Cliente c ON v.ClienteID = c.ClienteID
+JOIN Empleado em ON v.EmpleadoID = em.EmpleadoID
+LEFT JOIN Aval av ON v.AvalID = av.AvalID
+LEFT JOIN Beneficiario bf ON v.BeneficiarioID = bf.BeneficiarioID;
+GO
+

@@ -326,3 +326,72 @@ begin
     select scope_identity() as VentaID, 'Venta registrada exitosamente.' as Mensaje;
 end
 go
+
+-- =========================================================
+-- Procedimientos auxiliares: insertar personas desde el
+-- formulario de venta (Cliente, Aval, Beneficiario)
+-- =========================================================
+
+CREATE OR ALTER PROCEDURE sp_InsertarCliente
+    @Nombre   VARCHAR(100),
+    @DNI      VARCHAR(15),
+    @Telefono VARCHAR(15),
+    @Trabajo  VARCHAR(100),
+    @Sueldo   FLOAT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF LTRIM(RTRIM(@Nombre)) = ''
+    BEGIN RAISERROR('El nombre del cliente no puede estar vacio.', 16, 1); RETURN; END
+    IF LTRIM(RTRIM(@DNI)) = ''
+    BEGIN RAISERROR('El DNI del cliente es obligatorio.', 16, 1); RETURN; END
+    IF EXISTS (SELECT 1 FROM Cliente WHERE DNI = @DNI)
+    BEGIN RAISERROR('Ya existe un cliente con ese DNI.', 16, 1); RETURN; END
+    IF @Sueldo <= 0
+    BEGIN RAISERROR('El sueldo debe ser mayor a 0.', 16, 1); RETURN; END
+    INSERT INTO Cliente (Nombre, DNI, Telefono, Trabajo, Sueldo)
+    VALUES (@Nombre, @DNI, @Telefono, @Trabajo, @Sueldo);
+    SELECT SCOPE_IDENTITY() AS ClienteID;
+END
+GO
+
+CREATE OR ALTER PROCEDURE sp_InsertarAval
+    @Nombre   VARCHAR(100),
+    @DNI      VARCHAR(15),
+    @Telefono VARCHAR(15),
+    @Trabajo  VARCHAR(100),
+    @Sueldo   FLOAT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF LTRIM(RTRIM(@Nombre)) = ''
+    BEGIN RAISERROR('El nombre del aval no puede estar vacio.', 16, 1); RETURN; END
+    IF LTRIM(RTRIM(@DNI)) = ''
+    BEGIN RAISERROR('El DNI del aval es obligatorio.', 16, 1); RETURN; END
+    IF EXISTS (SELECT 1 FROM Aval WHERE DNI = @DNI)
+    BEGIN RAISERROR('Ya existe un aval con ese DNI.', 16, 1); RETURN; END
+    IF @Sueldo <= 0
+    BEGIN RAISERROR('El sueldo debe ser mayor a 0.', 16, 1); RETURN; END
+    INSERT INTO Aval (Nombre, DNI, Telefono, Trabajo, Sueldo)
+    VALUES (@Nombre, @DNI, @Telefono, @Trabajo, @Sueldo);
+    SELECT SCOPE_IDENTITY() AS AvalID;
+END
+GO
+
+CREATE OR ALTER PROCEDURE sp_InsertarBeneficiario
+    @Nombre     VARCHAR(100),
+    @DNI        VARCHAR(15),
+    @Telefono   VARCHAR(15),
+    @Parentesco VARCHAR(50)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF LTRIM(RTRIM(@Nombre)) = ''
+    BEGIN RAISERROR('El nombre del beneficiario no puede estar vacio.', 16, 1); RETURN; END
+    IF LTRIM(RTRIM(@DNI)) = ''
+    BEGIN RAISERROR('El DNI del beneficiario es obligatorio.', 16, 1); RETURN; END
+    INSERT INTO Beneficiario (Nombre, DNI, Telefono, Parentesco)
+    VALUES (@Nombre, @DNI, @Telefono, @Parentesco);
+    SELECT SCOPE_IDENTITY() AS BeneficiarioID;
+END
+GO

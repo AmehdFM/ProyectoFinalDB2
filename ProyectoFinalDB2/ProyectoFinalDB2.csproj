@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -105,11 +105,22 @@
     </Compile>
     <Compile Include="PanelPrincipal.cs" />
     <Compile Include="SeccionProyectos.cs" />
+    <Compile Include="FormDetalleProyecto.cs" />
+    <Compile Include="FormCrearVenta.cs" />
+    <Compile Include="FormCrearPersonaModal.cs" />
+    <Compile Include="FormCrearLote.cs" />
+    <Compile Include="FormCrearBloque.cs" />
+    <Compile Include="FormCrearEtapa.cs" />
     <Compile Include="FormCrearProyecto.cs" />
     <Compile Include="SeccionEmpleados.cs" />
     <Compile Include="FormEmpleado.cs" />
     <Compile Include="FormEmpleadoRendimiento.cs" />
-    <Compile Include="FormEmpleado.cs" />
+    <Compile Include="SeccionGastosProyecto .cs" />
+    <Compile Include="SeccionFinanciero.cs" />
+    <Compile Include="FormDetalleFinanciero.cs" />
+    <Compile Include="SeccionClientes.cs" />
+    <Compile Include="FormDetalleCliente.cs" />
+    <Compile Include="FormDetalleVenta.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
@@ -166,3 +177,5 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
+
+

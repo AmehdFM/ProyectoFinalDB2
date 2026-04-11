@@ -1,4 +1,4 @@
--- Trigger para Actualizar la información del lote cuando se inserte una venta
+-- Trigger para Actualizar la informaciÃ³n del lote cuando se inserte una venta
 
 CREATE OR ALTER TRIGGER tr_ActualizarEstadoLote
 ON Venta
@@ -11,7 +11,7 @@ BEGIN
 END
 GO
 
---Generar la factura automáticamente
+--Generar la factura automÃ¡ticamente
 CREATE OR ALTER TRIGGER tr_GenerarFacturaAutomatica ON Pago AFTER INSERT
 AS
 BEGIN
@@ -32,7 +32,7 @@ END
 GO
 
 
---Esta función crea por completo las cuotas a pagar por el cliente
+--Esta funciÃ³n crea por completo las cuotas a pagar por el cliente
 CREATE OR ALTER FUNCTION dbo.f_GenerarCuotas (@MontoFinanciar FLOAT, @TasaAnual FLOAT, @PlazoAnios INT)
 RETURNS @Amortizacion TABLE (CuotaNumero INT, FechaVencimiento DATETIME, MontoCuota FLOAT, Capital FLOAT, Interes FLOAT)
 AS
@@ -71,7 +71,7 @@ begin
      
     
    
-    -- obtenemos los datos de la venta recién insertada
+    -- obtenemos los datos de la venta reciÃ©n insertada
     select 
         @VentaID = VentaID, 
         @LoteID = LoteID, 
@@ -83,10 +83,10 @@ begin
 
     set @MontoTotal = dbo.fnValorLote(@LoteID)
 
+    set @MontoFinanciar = @MontoTotal - ISNULL(@Prima, 0)
+
     if (@tipo = 'credito')
     BEGIN
-    
-    set @MontoFinanciar = @MontoTotal - @Prima
 
 
     insert into PlanPago (VentaID, CuotaNumero, FechaVencimiento, Monto, Capital, Interes, Estado)
@@ -144,7 +144,7 @@ ON Venta
 AFTER DELETE
 AS
 BEGIN
-    -- Al eliminar la venta, el lote vuelve a estar disponible para el público
+    -- Al eliminar la venta, el lote vuelve a estar disponible para el pÃºblico
     UPDATE Lote
     SET Estado = 'Disponible'
     FROM Lote l

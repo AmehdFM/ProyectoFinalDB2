@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Data;
@@ -11,125 +11,123 @@ namespace ProyectoFinalDB2
     {
         private TextBox txtNombre, txtDepto, txtMuni;
         private NumericUpDown numPlazo;
-        private Label lblTitulo;
 
-        private static readonly Color ColorPrimario = Color.FromArgb(26, 26, 46);
-        private static readonly Color ColorTexto = Color.FromArgb(30, 30, 28);
-        private static readonly Color ColorFondo = Color.FromArgb(247, 247, 245);
+        private static readonly Color CPrimario  = Color.FromArgb(26, 26, 46);
+        private static readonly Color CAccent    = Color.FromArgb(67, 97, 238);
+        private static readonly Color CFondo     = Color.FromArgb(247, 248, 252);
+        private static readonly Color CBorder    = Color.FromArgb(210, 215, 230);
+        private static readonly Color CTexto     = Color.FromArgb(40, 50, 70);
+        private static readonly Color CSubtexto  = Color.FromArgb(120, 130, 155);
 
         public FormCrearProyecto()
         {
-            this.Text = "Nuevo Proyecto Inmobiliario";
-            this.Size = new Size(420, 520);
-            this.StartPosition = FormStartPosition.CenterParent;
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.BackColor = Color.White;
-            this.Font = new Font("Segoe UI", 9);
-            ConfigurarComponentes();
+            Text = "Nuevo Proyecto Inmobiliario";
+            Size = new Size(480, 545);
+            StartPosition = FormStartPosition.CenterParent;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            BackColor = CFondo;
+            Font = new Font("Segoe UI", 9);
+            Build();
         }
 
-        private void ConfigurarComponentes()
+        private void Build()
         {
-            int x = 40, y = 30, w = 300;
-            lblTitulo = new Label { Text = "Registrar proyecto", Location = new Point(x, 8), AutoSize = true, Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = ColorTexto };
-            this.Controls.Add(lblTitulo);
+            // ── Header ──
+            var hdr = new Panel { Dock = DockStyle.Top, Height = 72, BackColor = CPrimario };
+            hdr.Controls.Add(new Label { Text = "REGISTRAR PROYECTO", ForeColor = Color.White,
+                Font = new Font("Segoe UI", 13, FontStyle.Bold), AutoSize = true, Location = new Point(24, 12) });
+            hdr.Controls.Add(new Label { Text = "Complete los datos del nuevo proyecto inmobiliario",
+                ForeColor = Color.FromArgb(175, 185, 215), Font = new Font("Segoe UI", 8),
+                AutoSize = true, Location = new Point(26, 42) });
+            Controls.Add(hdr);
 
-            this.Controls.Add(new Label { Text = "Nombre del Proyecto", Location = new Point(x, y), AutoSize = true, Font = new Font("Segoe UI", 9), ForeColor = ColorTexto });
-            txtNombre = new TextBox { Location = new Point(x, y + 20), Width = w };
-            txtNombre.Font = new Font("Segoe UI", 9);
-            this.Controls.Add(txtNombre);
+            // ── Fields ──
+            int x = 34, y = 94, w = 380;
 
-            y += 70;
-            this.Controls.Add(new Label { Text = "Departamento", Location = new Point(x, y), AutoSize = true, Font = new Font("Segoe UI", 9), ForeColor = ColorTexto });
-            txtDepto = new TextBox { Location = new Point(x, y + 20), Width = w };
-            txtDepto.Font = new Font("Segoe UI", 9);
-            this.Controls.Add(txtDepto);
+            Lbl("Nombre del Proyecto *", x, y);
+            txtNombre = Txt(x, y + 22, w); y += 68;
 
-            y += 70;
-            this.Controls.Add(new Label { Text = "Municipio", Location = new Point(x, y), AutoSize = true, Font = new Font("Segoe UI", 9), ForeColor = ColorTexto });
-            txtMuni = new TextBox { Location = new Point(x, y + 20), Width = w };
-            txtMuni.Font = new Font("Segoe UI", 9);
-            this.Controls.Add(txtMuni);
+            Lbl("Departamento *", x, y);
+            txtDepto = Txt(x, y + 22, w); y += 68;
 
-            y += 70;
-            this.Controls.Add(new Label { Text = "Plazo Máximo (Meses)", Location = new Point(x, y), AutoSize = true, Font = new Font("Segoe UI", 9), ForeColor = ColorTexto });
-            numPlazo = new NumericUpDown { Location = new Point(x, y + 20), Width = w, Minimum = 1, Maximum = 480, Value = 120 };
-            numPlazo.Font = new Font("Segoe UI", 9);
-            this.Controls.Add(numPlazo);
+            Lbl("Municipio *", x, y);
+            txtMuni = Txt(x, y + 22, w); y += 68;
 
-            y += 80;
-            Button btnGuardar = new Button
-            {
-                Text = "REGISTRAR PROYECTO",
-                Location = new Point(x, y),
-                Size = new Size(w, 42),
-                BackColor = ColorPrimario,
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
-            btnGuardar.FlatAppearance.BorderSize = 0;
-            btnGuardar.Click += GuardarProyecto;
+            Lbl("Plazo Máximo (meses) *", x, y);
+            numPlazo = new NumericUpDown { Location = new Point(x, y + 22), Width = w,
+                Minimum = 1, Maximum = 480, Value = 120,
+                Font = new Font("Segoe UI", 9), BorderStyle = BorderStyle.FixedSingle };
+            Controls.Add(numPlazo);
+            Controls.Add(new Label { Text = "Ej: 120 = 10 años · 240 = 20 años · 360 = 30 años",
+                Location = new Point(x, y + 48), AutoSize = true,
+                Font = new Font("Segoe UI", 7.5f), ForeColor = CSubtexto });
+            y += 102;
 
-            Button btnCancelar = new Button
-            {
-                Text = "CANCELAR",
-                Location = new Point(x, y + 52),
-                Size = new Size(w, 36),
-                BackColor = Color.White,
-                ForeColor = ColorPrimario,
-                FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 9, FontStyle.Regular),
-                Cursor = Cursors.Hand,
-                DialogResult = DialogResult.Cancel
-            };
-            btnCancelar.FlatAppearance.BorderColor = Color.FromArgb(220, 220, 215);
-            btnCancelar.FlatAppearance.BorderSize = 1;
+            // ── Buttons ──
+            var btnOk = Btn("REGISTRAR PROYECTO", x, y, w, CAccent, Color.White);
+            btnOk.Click += Save;
+            var btnCx = Btn("CANCELAR", x, y + 50, w, CFondo, CTexto);
+            btnCx.FlatAppearance.BorderColor = CBorder;
+            btnCx.FlatAppearance.BorderSize = 1;
+            btnCx.DialogResult = DialogResult.Cancel;
 
-            this.AcceptButton = btnGuardar;
-            this.CancelButton = btnCancelar;
-
-            this.Controls.Add(btnGuardar);
-            this.Controls.Add(btnCancelar);
+            AcceptButton = btnOk;
+            CancelButton = btnCx;
+            Controls.Add(btnOk);
+            Controls.Add(btnCx);
         }
 
-        private void GuardarProyecto(object sender, EventArgs e)
+        private void Lbl(string t, int x, int y) =>
+            Controls.Add(new Label { Text = t, Location = new Point(x, y), AutoSize = true,
+                Font = new Font("Segoe UI", 8.5f, FontStyle.Bold), ForeColor = Color.FromArgb(55, 65, 90) });
+
+        private TextBox Txt(int x, int y, int w)
+        {
+            var t = new TextBox { Location = new Point(x, y), Width = w,
+                Font = new Font("Segoe UI", 9), BorderStyle = BorderStyle.FixedSingle, BackColor = Color.White };
+            Controls.Add(t); return t;
+        }
+
+        private Button Btn(string text, int x, int y, int w, Color back, Color fore)
+        {
+            var b = new Button { Text = text, Location = new Point(x, y), Size = new Size(w, 40),
+                BackColor = back, ForeColor = fore, FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 9, FontStyle.Bold), Cursor = Cursors.Hand };
+            b.FlatAppearance.BorderSize = 0;
+            return b;
+        }
+
+        private void Save(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtNombre.Text))
-            {
-                MessageBox.Show("El nombre del proyecto es obligatorio.");
-                return;
-            }
+            { Warn("El nombre del proyecto es obligatorio."); txtNombre.Focus(); return; }
+            if (string.IsNullOrWhiteSpace(txtDepto.Text))
+            { Warn("El departamento es obligatorio."); txtDepto.Focus(); return; }
+            if (string.IsNullOrWhiteSpace(txtMuni.Text))
+            { Warn("El municipio es obligatorio."); txtMuni.Focus(); return; }
 
             try
             {
                 string cs = ConfigurationManager.ConnectionStrings["ConexionInversiones"]?.ConnectionString;
-                if (string.IsNullOrEmpty(cs))
-                {
-                    MessageBox.Show("Cadena de conexión no encontrada.");
-                    return;
-                }
-
-                using (SqlConnection conn = new SqlConnection(cs))
-                using (SqlCommand cmd = new SqlCommand("spCrearProyecto", conn))
+                if (string.IsNullOrEmpty(cs)) { Err("Cadena de conexión no encontrada."); return; }
+                using (var conn = new SqlConnection(cs))
+                using (var cmd = new SqlCommand("spCrearProyecto", conn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add(new SqlParameter("@Nombre", SqlDbType.VarChar, 100) { Value = txtNombre.Text });
-                    cmd.Parameters.Add(new SqlParameter("@Departamento", SqlDbType.VarChar, 50) { Value = txtDepto.Text });
-                    cmd.Parameters.Add(new SqlParameter("@Municipio", SqlDbType.VarChar, 50) { Value = txtMuni.Text });
-                    cmd.Parameters.Add(new SqlParameter("@PlazoMaximo", SqlDbType.Int) { Value = (int)numPlazo.Value });
-
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                    MessageBox.Show("Proyecto guardado exitosamente.");
-                    this.DialogResult = DialogResult.OK;
+                    cmd.Parameters.Add(new SqlParameter("@Nombre",      SqlDbType.VarChar, 100) { Value = txtNombre.Text.Trim() });
+                    cmd.Parameters.Add(new SqlParameter("@Departamento", SqlDbType.VarChar, 50)  { Value = txtDepto.Text.Trim() });
+                    cmd.Parameters.Add(new SqlParameter("@Municipio",   SqlDbType.VarChar, 50)  { Value = txtMuni.Text.Trim() });
+                    cmd.Parameters.Add(new SqlParameter("@PlazoMaximo", SqlDbType.Int)           { Value = (int)numPlazo.Value });
+                    conn.Open(); cmd.ExecuteNonQuery();
                 }
+                MessageBox.Show("Proyecto registrado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                DialogResult = DialogResult.OK;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error al guardar: " + ex.Message);
-            }
+            catch (Exception ex) { Err(ex.Message); }
         }
+
+        private void Warn(string m) => MessageBox.Show(m, "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        private void Err(string m)  => MessageBox.Show(m, "Error",      MessageBoxButtons.OK, MessageBoxIcon.Error);
     }
 }
