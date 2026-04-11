@@ -144,8 +144,8 @@ namespace ProyectoFinalDB2
 
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_GetMorosidadReport", conn);
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlCommand cmd = new SqlCommand("SELECT Cliente, Monto as Saldo, 'MOROSO' as Estado FROM vCuotasPendientes", conn);
+                    cmd.CommandType = CommandType.Text;
 
                     conn.Open();
                     SqlDataReader reader = cmd.ExecuteReader();

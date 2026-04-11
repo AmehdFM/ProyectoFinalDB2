@@ -187,8 +187,8 @@ namespace ProyectoFinalDB2
                 using (var conn = new SqlConnection(connStr))
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "sp_GetResumenFinancieroGlobal";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "SELECT ProyectoID, Proyecto, IngresoTotal, GastoTotal, BeneficioTotal FROM vResumenFinancieroProyecto ORDER BY Proyecto";
+                    cmd.CommandType = CommandType.Text;
                     conn.Open();
                     using (var r = cmd.ExecuteReader())
                     {

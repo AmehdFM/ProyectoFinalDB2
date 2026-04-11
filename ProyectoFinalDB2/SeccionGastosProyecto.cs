@@ -117,8 +117,8 @@ namespace ProyectoFinalDB2
             {
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_GetGastosPorProyecto", conn);
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlCommand cmd = new SqlCommand("SELECT * FROM dbo.fnGastosProyecto(@ProyectoID)", conn);
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@ProyectoID", proyectoId);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
