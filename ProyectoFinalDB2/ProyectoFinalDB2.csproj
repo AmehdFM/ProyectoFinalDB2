@@ -103,24 +103,60 @@
     <Compile Include="Cruds\Venta.Designer.cs">
       <DependentUpon>Venta.cs</DependentUpon>
     </Compile>
-    <Compile Include="PanelPrincipal.cs" />
-    <Compile Include="SeccionProyectos.cs" />
-    <Compile Include="FormDetalleProyecto.cs" />
-    <Compile Include="FormCrearVenta.cs" />
-    <Compile Include="FormCrearPersonaModal.cs" />
-    <Compile Include="FormCrearLote.cs" />
-    <Compile Include="FormCrearBloque.cs" />
-    <Compile Include="FormCrearEtapa.cs" />
-    <Compile Include="FormCrearProyecto.cs" />
-    <Compile Include="SeccionEmpleados.cs" />
-    <Compile Include="FormEmpleado.cs" />
-    <Compile Include="FormEmpleadoRendimiento.cs" />
-    <Compile Include="SeccionGastosProyecto .cs" />
-    <Compile Include="SeccionFinanciero.cs" />
-    <Compile Include="FormDetalleFinanciero.cs" />
-    <Compile Include="SeccionClientes.cs" />
-    <Compile Include="FormDetalleCliente.cs" />
-    <Compile Include="FormDetalleVenta.cs" />
+    <Compile Include="PanelPrincipal.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SeccionProyectos.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormDetalleProyecto.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCrearVenta.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCrearPersonaModal.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCrearLote.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCrearBloque.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCrearEtapa.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCrearProyecto.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SeccionEmpleados.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormEmpleado.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormEmpleadoRendimiento.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SeccionGastosProyecto .cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SeccionFinanciero.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormDetalleFinanciero.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SeccionClientes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormDetalleCliente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormDetalleVenta.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
@@ -177,5 +213,3 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
-
-
