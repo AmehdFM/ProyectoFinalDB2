@@ -129,15 +129,13 @@ namespace ProyectoFinalDB2
         private void CargarDatosDesdeBD()
         {
             dgvMorosos.Columns.Clear();
-            dgvMorosos.Columns.Add("ClienteID", "ID");
             dgvMorosos.Columns.Add("Nombre", "CLIENTE / PROPIETARIO");
             dgvMorosos.Columns.Add("Saldo", "SALDO TOTAL VENCIDO");
             dgvMorosos.Columns.Add("Estado", "ESTADO");
 
-            dgvMorosos.Columns["ClienteID"].FillWeight = 15;
-            dgvMorosos.Columns["Nombre"].FillWeight = 45;
+            dgvMorosos.Columns["Nombre"].FillWeight = 55;
             dgvMorosos.Columns["Saldo"].FillWeight = 25;
-            dgvMorosos.Columns["Estado"].FillWeight = 15;
+            dgvMorosos.Columns["Estado"].FillWeight = 20;
 
             try
             {
@@ -157,7 +155,7 @@ namespace ProyectoFinalDB2
                     int count = 0;
                     while (reader.Read())
                     {
-                        dgvMorosos.Rows.Add(reader["ClienteID"], reader["Nombre"], reader["Saldo"], reader["Estado"]);
+                        dgvMorosos.Rows.Add(reader["Nombre"], reader["Saldo"], reader["Estado"]);
                         count++;
                     }
                     lblConteo.Text = $"{count} clientes analizados en tiempo real.";
@@ -182,9 +180,9 @@ namespace ProyectoFinalDB2
 
         private void CargarEjemplo()
         {
-            dgvMorosos.Rows.Add(101, "CARLOS MARTÍNEZ RIVERA", 24500.00, "MOROSO");
-            dgvMorosos.Rows.Add(102, "MARÍA FERNANDA LÓPEZ", 0.00, "AL DÍA");
-            dgvMorosos.Rows.Add(103, "ROBERTO SOSA", 8940.50, "MOROSO");
+            dgvMorosos.Rows.Add("CARLOS MARTÍNEZ RIVERA", 24500.00, "MOROSO");
+            dgvMorosos.Rows.Add("MARÍA FERNANDA LÓPEZ", 0.00, "AL DÍA");
+            dgvMorosos.Rows.Add("ROBERTO SOSA", 8940.50, "MOROSO");
             lblConteo.Text = "Modo demostración (sin conexión a base de datos)";
         }
     }
