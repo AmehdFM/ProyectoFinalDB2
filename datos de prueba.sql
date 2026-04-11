@@ -72,6 +72,12 @@ VALUES
 ('EILEN SUAZO', '0801-2015-00445', '9900-1122', 'HIJA'),
 ('MARIANO LÓPEZ', '0501-2010-00778', '3311-2244', 'HIJO')
 
+INSERT INTO Gastos (ProyectoID, Concepto, Monto)
+VALUES(1, 'Renta de Retroexcavadora 8 horas', 12000.00)
+
+INSERT INTO Gastos (ProyectoID, Concepto, Monto)
+VALUES(1, 'postes de madera para alumbrado 12 unidades', 24000.00)
+
 
 
 
