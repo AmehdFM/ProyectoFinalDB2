@@ -1,4 +1,4 @@
--- Función escalar que devuelve el total de lotes disponibles en una etapa
+ï»¿-- FunciÃƒÂ³n escalar que devuelve el total de lotes disponibles en una etapa
 create or alter function dbo.fnTotalLotesDisponibles(@etapaid int)
 returns int
 as
@@ -11,7 +11,7 @@ return @totalLotes
 end
 go
 
--- Función escalar que calcula el valor total de un lote según su área y precio por vara
+-- FunciÃƒÂ³n escalar que calcula el valor total de un lote segÃƒÂºn su ÃƒÂ¡rea y precio por vara
 create or alter function dbo.fnValorLote(@loteid int)
 returns float
 as
@@ -33,7 +33,7 @@ inner join Bloque b on e.EtapaID = b.EtapaID
 inner join Lote l on b.BloqueID = l.BloqueID
 where l.LoteID = @loteid
 
--- cálculo base: área multiplicada por el precio por vara de la etapa
+-- cÃƒÂ¡lculo base: ÃƒÂ¡rea multiplicada por el precio por vara de la etapa
 set @valorLote = @area * @preciovara
 
 
@@ -45,7 +45,7 @@ return @valorLote
 end
 go
 
--- Función escalar que calcula la cantidad de años de un crédito a partir de la fecha de la venta y la fecha de vencimiento
+-- FunciÃƒÂ³n escalar que calcula la cantidad de aÃƒÂ±os de un crÃƒÂ©dito a partir de la fecha de la venta y la fecha de vencimiento
 create or alter function dbo.fnEsClienteMoroso(@clienteid int)
 returns bit
 as
@@ -68,7 +68,7 @@ return @moroso
 end
 go
 
--- Función escalar que devuelve el saldo pendiente de un cliente en base a sus pagos realizados
+-- FunciÃƒÂ³n escalar que devuelve el saldo pendiente de un cliente en base a sus pagos realizados
 create or alter function dbo.fnSaldoPendiente(@clienteid int)
 returns float
 as
@@ -90,7 +90,7 @@ return isnull(@totalDeuda, 0) - isnull(@totalPagado, 0)
 end
 go
 
--- Función escalar que calcula la cantidad de pagos pendientes de un cliente
+-- FunciÃƒÂ³n escalar que calcula la cantidad de pagos pendientes de un cliente
 create or alter function dbo.fnpagospendientes(@clienteid int)
 returns int
 as
@@ -106,7 +106,7 @@ return isnull(@pagospendientes, 0)
 end
 go
 
--- Función tipo tabla que devuelve todos los lotes disponibles en una etapa
+-- FunciÃƒÂ³n tipo tabla que devuelve todos los lotes disponibles en una etapa
 create or alter function dbo.fnLotesDisponiblesPorEtapa(@etapaid int)
 returns table
 as
@@ -119,7 +119,7 @@ return
 )
 go
 
--- Función tipo tabla que devuelve todos los lotes vendidos
+-- FunciÃƒÂ³n tipo tabla que devuelve todos los lotes vendidos
 create or alter function dbo.fnResumenVentasPorEmpleado()
 returns table
 as
@@ -135,7 +135,7 @@ return
 )
 go
 
--- Función tipo tabla que devuelve el historial de pagos de un cliente
+-- FunciÃƒÂ³n tipo tabla que devuelve el historial de pagos de un cliente
 create or alter function dbo.fnHistorialPagos(@ClienteID int)
 returns table
 as
@@ -156,7 +156,7 @@ return
 )
 go
 
--- Función tipo tabla que devuelve los clientes que tienen pagos pendientes
+-- FunciÃƒÂ³n tipo tabla que devuelve los clientes que tienen pagos pendientes
 create or alter function dbo.fnClientesConPagosPendientes()
 returns table
 as
@@ -181,7 +181,7 @@ return
 )
 go
 
--- Función tipo tabla que devuelve los gastos realizados en un proyecto
+-- FunciÃƒÂ³n tipo tabla que devuelve los gastos realizados en un proyecto
 create or alter function dbo.fnGastosProyecto(@ProyectoID int)
 returns table
 as
@@ -205,9 +205,9 @@ as
 return (
     select
         Nombre as 'Nombre',
-        PrecioVara as 'Precio x Vara',
-        Interes as 'Interés (%)',
-        AreaVerde as 'Área Verde (%)'
+        PrecioVara as 'Precio x Metro',
+        Interes as 'InterÃ©s (%)',
+        AreaVerde * 100 as 'Ãrea Verde (%)'
     from Etapa
     where ProyectoID = @ProyectoID
 )
@@ -219,7 +219,7 @@ as
 return (
     select
         E.Nombre as 'Etapa',
-        B.NumeroBloque as 'Número de Bloque'
+        B.NumeroBloque as 'NÃºmero de Bloque'
     from Bloque B
     join Etapa E on B.EtapaID = E.EtapaID
     where E.ProyectoID = @ProyectoID
@@ -234,14 +234,14 @@ return (
         L.LoteID,
         E.Nombre as 'Etapa',
         B.NumeroBloque as 'Bloque',
-        L.Numero as 'Número de Lote',
-        L.Area as 'Área (v²)',
+        L.Numero as 'NÃºmero de Lote',
+        L.Area as 'Ãrea (vÂ²)',
         L.Catastro as 'Catastro',
-        L.Matricula as 'Matrícula',
+        L.Matricula as 'MatrÃ­cula',
         L.Colindancias as 'Colindancias',
-        case when L.Esquina = 1 then 'Sí' else 'No' end as 'Esquina',
-        case when L.Parque = 1 then 'Sí' else 'No' end as 'Parque',
-        case when L.CalleCerrada = 1 then 'Sí' else 'No' end as 'Calle Cerrada',
+        case when L.Esquina = 1 then 'SÃ­' else 'No' end as 'Esquina',
+        case when L.Parque = 1 then 'SÃ­' else 'No' end as 'Parque',
+        case when L.CalleCerrada = 1 then 'SÃ­' else 'No' end as 'Calle Cerrada',
         L.Estado as 'Estado'
     from Lote L
     join Bloque B on L.BloqueID = B.BloqueID
@@ -249,3 +249,4 @@ return (
     where E.ProyectoID = @ProyectoID
 )
 go
+
