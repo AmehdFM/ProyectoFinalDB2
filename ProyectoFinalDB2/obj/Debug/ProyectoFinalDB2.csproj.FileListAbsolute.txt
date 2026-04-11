@@ -53,3 +53,22 @@ C:\Users\User\Desktop\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalD
 C:\Users\User\Desktop\ProyectoFinalDB2\ProyectoFinalDB2\bin\Debug\ProyectoFinalDB2.exe.config
 C:\Users\User\Desktop\ProyectoFinalDB2\ProyectoFinalDB2\bin\Debug\ProyectoFinalDB2.exe
 C:\Users\User\Desktop\ProyectoFinalDB2\ProyectoFinalDB2\bin\Debug\ProyectoFinalDB2.pdb
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\bin\Debug\ProyectoFinalDB2.exe.config
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\bin\Debug\ProyectoFinalDB2.exe
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\bin\Debug\ProyectoFinalDB2.pdb
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.csproj.AssemblyReference.cache
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.exe.config
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.Form1.resources
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.Cruds.Bloque.resources
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.Cruds.Cliente.resources
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.Cruds.Empleado.resources
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.Cruds.Etapa.resources
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.Cruds.Lote.resources
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.Cruds.Pago.resources
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.Cruds.Proyecto.resources
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.Cruds.Venta.resources
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.Properties.Resources.resources
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.csproj.GenerateResource.cache
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.csproj.CoreCompileInputs.cache
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.exe
+C:\Users\USER\Desktop\Proyecto DB\ProyectoFinalDB2\ProyectoFinalDB2\obj\Debug\ProyectoFinalDB2.pdb

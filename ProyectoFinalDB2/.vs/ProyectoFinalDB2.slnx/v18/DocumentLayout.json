@@ -3,36 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearVenta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:FormCrearVenta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormDetalleProyecto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:FormDetalleProyecto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearLote.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:FormCrearLote.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearBloque.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:FormCrearBloque.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearEtapa.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:FormCrearEtapa.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearProyecto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:FormCrearProyecto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\PanelPrincipal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:PanelPrincipal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\SeccionProyectos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:SeccionProyectos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\ProyectoFinalDB2.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:ProyectoFinalDB2.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -47,99 +23,28 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "FormCrearVenta.cs",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearVenta.cs",
-              "RelativeDocumentMoniker": "FormCrearVenta.cs",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearVenta.cs",
-              "RelativeToolTip": "FormCrearVenta.cs",
-              "ViewState": "AgIAAA0BAAAAAAAAAAAAABUBAAAMAAAAAAAAAA==",
+              "Title": "PanelPrincipal.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\PanelPrincipal.cs",
+              "RelativeDocumentMoniker": "PanelPrincipal.cs",
+              "ToolTip": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\PanelPrincipal.cs",
+              "RelativeToolTip": "PanelPrincipal.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAALMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-11T00:56:11.195Z",
+              "WhenOpened": "2026-04-11T05:58:53.055Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "FormCrearBloque.cs",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearBloque.cs",
-              "RelativeDocumentMoniker": "FormCrearBloque.cs",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearBloque.cs",
-              "RelativeToolTip": "FormCrearBloque.cs",
-              "ViewState": "AgIAAHAAAAAAAAAAAAAswIQAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-10T23:03:06.635Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "FormCrearEtapa.cs",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearEtapa.cs",
-              "RelativeDocumentMoniker": "FormCrearEtapa.cs",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearEtapa.cs",
-              "RelativeToolTip": "FormCrearEtapa.cs",
-              "ViewState": "AgIAAGYAAAAAAAAAAAAswHoAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-10T23:02:25.866Z"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "FormDetalleProyecto.cs",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormDetalleProyecto.cs",
-              "RelativeDocumentMoniker": "FormDetalleProyecto.cs",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormDetalleProyecto.cs",
-              "RelativeToolTip": "FormDetalleProyecto.cs",
-              "ViewState": "AgIAABMBAAAAAAAAAAAYwCUBAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-10T21:31:48.038Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "FormCrearLote.cs",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearLote.cs",
-              "RelativeDocumentMoniker": "FormCrearLote.cs",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearLote.cs",
-              "RelativeToolTip": "FormCrearLote.cs",
-              "ViewState": "AgIAAL4AAAAAAAAAAAAYwM0AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-10T23:03:43.659Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "ProyectoFinalDB2.csproj",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\ProyectoFinalDB2.csproj",
-              "RelativeDocumentMoniker": "ProyectoFinalDB2.csproj",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\ProyectoFinalDB2.csproj",
-              "RelativeToolTip": "ProyectoFinalDB2.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAxwKcAAAAKAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-04-10T21:33:54.347Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "FormCrearProyecto.cs",
-              "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearProyecto.cs",
-              "RelativeDocumentMoniker": "FormCrearProyecto.cs",
-              "ToolTip": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\FormCrearProyecto.cs",
-              "RelativeToolTip": "FormCrearProyecto.cs",
-              "ViewState": "AgIAAGgAAAAAAAAAAAAcwHIAAAA6AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-10T21:08:50.063Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
               "Title": "SeccionProyectos.cs",
               "DocumentMoniker": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\SeccionProyectos.cs",
               "RelativeDocumentMoniker": "SeccionProyectos.cs",
               "ToolTip": "C:\\Users\\DELL\\Desktop\\ProyectoFinalDB2\\ProyectoFinalDB2\\SeccionProyectos.cs",
               "RelativeToolTip": "SeccionProyectos.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAOYAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAAOYAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-10T21:05:41.441Z"
+              "WhenOpened": "2026-04-10T21:05:41.441Z",
+              "EditorCaption": ""
             }
           ]
         }
