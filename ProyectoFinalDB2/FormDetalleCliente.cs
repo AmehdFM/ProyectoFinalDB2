@@ -40,17 +40,20 @@ namespace ProyectoFinalDB2
             brand.Controls.Add(new Label { Text = clienteNombre.Split(' ')[0].ToUpper(), ForeColor = Color.White, Font = new Font("Segoe UI", 10, FontStyle.Bold), Dock = DockStyle.Bottom, TextAlign = ContentAlignment.TopCenter, Height = 44 });
             sidebar.Controls.Add(brand);
 
+            var btnDatos = NavBtn("👤  Datos del Cliente");
             var btnPlan = NavBtn("📅  Plan de Pagos");
             var btnHist = NavBtn("📊  Historial de Recibos");
             var btnFacturas = NavBtn("🧾  Facturas Emitidas");
             var btnPago = NavBtn("💳  Registrar Pago");
 
+            btnDatos.Click += (s, e) => { ActivarNav(btnDatos, "Perfil del Cliente"); MostrarDatosCliente(); };
             btnPlan.Click += (s, e) => { ActivarNav(btnPlan, "Plan de Pagos"); MostrarGrid("Plan"); };
             btnHist.Click += (s, e) => { ActivarNav(btnHist, "Historial y Recibos Emitidos"); MostrarGrid("Historial"); };
             btnFacturas.Click += (s, e) => { ActivarNav(btnFacturas, "Facturas Emitidas"); MostrarGrid("Facturas"); };
             btnPago.Click += (s, e) => { ActivarNav(btnPago, "Registrar Nuevo Pago"); MostrarPanelPago(); };
 
             sidebar.Controls.Add(new Label { Text = "  INFORMACIÓN", ForeColor = Color.FromArgb(71, 85, 105), Font = new Font("Segoe UI", 7, FontStyle.Bold), Dock = DockStyle.Top, Height = 36, TextAlign = ContentAlignment.MiddleLeft, Padding = new Padding(16, 0, 0, 0) });
+            sidebar.Controls.Add(btnDatos);
             sidebar.Controls.Add(btnPlan);
             sidebar.Controls.Add(btnHist);
             sidebar.Controls.Add(btnFacturas);
@@ -273,6 +276,80 @@ namespace ProyectoFinalDB2
                     } catch(Exception ex) { MessageBox.Show("Ocurrió un error al registrar el pago: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                 }
             };
+        }
+
+        private void MostrarDatosCliente()
+        {
+            pnlContenedorPrincipal.Controls.Clear();
+
+            var card = new Panel 
+            { 
+                Width = 600, Height = 450, 
+                BackColor = CCard, 
+                Location = new Point(24, 24),
+                Padding = new Padding(30)
+            };
+            card.Paint += (s, e) => {
+                using (var pen = new Pen(CBorder, 1)) {
+                    e.Graphics.DrawRectangle(pen, 0, 0, card.Width - 1, card.Height - 1);
+                }
+            };
+
+            var pic = new Label { Text = "👤", Font = new Font("Segoe UI", 48), Size = new Size(100, 100), TextAlign = ContentAlignment.MiddleCenter, ForeColor = CSidebarSel };
+            pic.Location = new Point(card.Width / 2 - 50, 30);
+            card.Controls.Add(pic);
+
+            var lblNombre = new Label { 
+                Text = clienteNombre.ToUpper(), 
+                Font = new Font("Segoe UI", 16, FontStyle.Bold), 
+                ForeColor = Color.FromArgb(15, 23, 42), 
+                TextAlign = ContentAlignment.MiddleCenter,
+                Size = new Size(card.Width, 40),
+                Location = new Point(0, 140)
+            };
+            card.Controls.Add(lblNombre);
+
+            var line = new Panel { Height = 1, BackColor = CBorder, Width = 500, Location = new Point(50, 190) };
+            card.Controls.Add(line);
+
+            // Container for Info items
+            var infoContainer = new Panel { Location = new Point(50, 210), Size = new Size(500, 200) };
+            card.Controls.Add(infoContainer);
+
+            try
+            {
+                using (var conn = new SqlConnection(connStr))
+                using (var cmd = new SqlCommand("sp_GetDetalleCliente", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ClienteID", clienteId);
+                    conn.Open();
+
+                    using (var dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            AddDataItem(infoContainer, "IDENTIDAD (DNI)", dr["DNI"].ToString(), 0);
+                            AddDataItem(infoContainer, "TELÉFONO", dr["Telefono"].ToString(), 50);
+                            AddDataItem(infoContainer, "LUGAR DE TRABAJO", dr["Trabajo"].ToString(), 100);
+                            
+                            double sueldo = Convert.ToDouble(dr["Sueldo"]);
+                            AddDataItem(infoContainer, "SUELDO MENSUAL", "L. " + sueldo.ToString("N2"), 150);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { MessageBox.Show("Error al cargar datos: " + ex.Message); }
+
+            pnlContenedorPrincipal.Controls.Add(card);
+        }
+
+        private void AddDataItem(Panel parent, string label, string value, int y)
+        {
+            var lblL = new Label { Text = label, Font = new Font("Segoe UI", 7.5f, FontStyle.Bold), ForeColor = CSub, AutoSize = true, Location = new Point(0, y) };
+            var lblV = new Label { Text = value, Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(30, 41, 59), AutoSize = true, Location = new Point(0, y + 18) };
+            parent.Controls.Add(lblL);
+            parent.Controls.Add(lblV);
         }
     }
 }

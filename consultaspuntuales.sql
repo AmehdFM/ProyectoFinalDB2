@@ -297,3 +297,15 @@ BEGIN
     SELECT BeneficiarioID, Nombre FROM Beneficiario ORDER BY Nombre;
 END
 GO
+
+-- 24. Detalle Completo de un Cliente
+CREATE OR ALTER PROCEDURE sp_GetDetalleCliente
+    @ClienteID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT ClienteID, Nombre, DNI, Telefono, Trabajo, Sueldo
+    FROM Cliente
+    WHERE ClienteID = @ClienteID;
+END
+GO
